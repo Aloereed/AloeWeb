@@ -29,15 +29,18 @@ namespace AloeWeb_browser
     {
         string OriginalUserAgent;
         string GoogleSignInUserAgent;
-
+        WebView2 WebBrowser;
+        Frame TabContent;
+        TabViewItem CurrTab;
         public MainPage()
         {
             this.InitializeComponent();
             //creates settings file on app first launch
             SettingsData settings = new SettingsData();
             settings.CreateSettingsFile();
-
-
+            WebBrowser = FirstWebBrowser;
+            TabContent = FirstTabContent;
+            CurrTab = FirstTab;
             //google login fix
             WebBrowser.CoreWebView2Initialized += delegate
             {
@@ -76,7 +79,7 @@ namespace AloeWeb_browser
             WebBrowser.Reload();
 
         }
-
+        
         //navigation completed
         private void WebBrowser_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
         {
@@ -85,8 +88,8 @@ namespace AloeWeb_browser
             {
                 WebBrowser.CoreWebView2.Settings.IsStatusBarEnabled = false;
                 Uri icoURI = new Uri("https://www.google.com/s2/favicons?sz=64&domain_url=" + WebBrowser.Source);
-                FirstTab.IconSource = new Microsoft.UI.Xaml.Controls.BitmapIconSource() { UriSource = icoURI, ShowAsMonochrome = false };
-                FirstTab.Header = WebBrowser.CoreWebView2.DocumentTitle.ToString();
+                CurrTab.IconSource = new Microsoft.UI.Xaml.Controls.BitmapIconSource() { UriSource = icoURI, ShowAsMonochrome = false };
+                CurrTab.Header = WebBrowser.CoreWebView2.DocumentTitle.ToString();
                 SearchBar.Text = WebBrowser.Source.AbsoluteUri;
                 RefreshButton.Visibility = Visibility.Visible;
                 StopRefreshButton.Visibility = Visibility.Collapsed;
@@ -114,6 +117,7 @@ namespace AloeWeb_browser
                 {
                     Content = "This website has a SSL certificate"
                 };
+                WebBrowser.CoreWebView2.ServerCertificateErrorDetected += CoreWebView2_ServerCertificateErrorDetected;
                 ToolTipService.SetToolTip(SSLButton, tooltip);
 
             }
@@ -145,6 +149,11 @@ namespace AloeWeb_browser
             //}';
             //  document.head.append(style);
             //}, false);");
+        }
+
+        private void CoreWebView2_ServerCertificateErrorDetected(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2ServerCertificateErrorDetectedEventArgs args)
+        {
+            ToolTipService.SetToolTip(SSLButton, "This website has a SSL certificate, however, some errors are detected.");
         }
 
         //if enter is pressed, it searches text in SearchBar or goes to web page
@@ -239,21 +248,28 @@ namespace AloeWeb_browser
         }
 
         //add new tab
-        private void Tabs_AddTabButtonClick(TabView sender, object args)
+        private async void Tabs_AddTabButtonClick(TabView sender, object args)
         {
-            //WebView2 webView = new WebView2();
-            //await webView.EnsureCoreWebView2Async();
+            WebView2 webView = new WebView2();
+            await webView.EnsureCoreWebView2Async();
+            webView.NavigationStarting += WebBrowser_NavigationStarting;
+            webView.NavigationCompleted += WebBrowser_NavigationCompleted;
+            Frame frame = new Frame();
+            frame.Content = webView;
             //webView.CoreWebView2.Navigate("https://google.com");
             //newTab.Content = new HomePage();
             //sender.TabItems.Add(new TabViewItem() { Content = newTab });
             //sender.SelectedItem = newTab ;
             //SearchBar.Text = newTab.Header.ToString();
-            sender.TabItems.Add(new TabViewItem()
+
+            TabViewItem tvi = new TabViewItem()
             {
-                Content = new HomePage(),
+                Content = frame,
                 IconSource = new Microsoft.UI.Xaml.Controls.SymbolIconSource() { Symbol = Symbol.Home },
                 Header = "Home page"
-            });
+            };
+            sender.TabItems.Add(tvi);
+            webView.Source = new Uri("https://www.google.com");
             sender.SelectedItem = Tabs.TabItems.Last();
         }
 
@@ -283,10 +299,24 @@ namespace AloeWeb_browser
             }
             else
             {
+                CurrTab = (TabViewItem)(e.AddedItems[0]);
+                TabContent = (Frame)(CurrTab.Content);
+                WebBrowser = (WebView2)(TabContent.Content);
+                
                 SearchBar.Text = WebBrowser.Source.AbsoluteUri;
             }
         }
 
+        private void DownloadMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            WebBrowser.CoreWebView2.OpenDefaultDownloadDialog();
+        }
+
+        private void DevToolsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            WebBrowser.CoreWebView2.OpenDevToolsWindow();
+            WebBrowser.CoreWebView2.OpenTaskManagerWindow();
+        }
     }
 }
 

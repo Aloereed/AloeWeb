@@ -218,10 +218,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.13</Version>
+      <Version>6.2.14</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.8.0-prerelease.220413001</Version>
+      <Version>2.8.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

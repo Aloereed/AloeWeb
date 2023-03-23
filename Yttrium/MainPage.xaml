@@ -140,9 +140,17 @@
                         <!-- settings button -->
                         <MenuFlyoutItem x:Name="DownloadMenuItem"
                                         Text="Downloads"
-                                        >
+                                        Click="DownloadMenuItem_Click">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE713;" />
+                                <FontIcon Glyph="&#xE896;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                        <MenuFlyoutItem x:Name="DevToolsMenuItem"
+                                        Text="Developer Tools"
+                                        Click="DevToolsMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xEC7A;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutItem x:Name="SettingsMenuItem"
@@ -183,11 +191,11 @@
                     <Grid/>
                 </winui:TabView.TabStripFooter>
                 <winui:TabViewItem x:Name="FirstTab" Header="Blank" winui:BackdropMaterial.ApplyToRootOrPageBackground="True">
-                    <Frame x:Name="TabContent">
+                    <Frame x:Name="FirstTabContent">
                         <!-- webview -->
                         <winui:WebView2 NavigationStarting="WebBrowser_NavigationStarting"
                                     NavigationCompleted="WebBrowser_NavigationCompleted"
-                                    x:Name="WebBrowser"
+                                    x:Name="FirstWebBrowser"
                                     Visibility="Visible"
                                     Source="https://google.com/"/>
 
