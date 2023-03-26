@@ -26,15 +26,23 @@ namespace AloeWeb_browser
         {
             this.InitializeComponent();
             settingsNavView.SelectedItem = FavoritesItem;
+            currSet = this;
         }
-
+        public static SettingsPage currSet;
         private void settingsNavView_BackRequested(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewBackRequestedEventArgs args)
         {
             if (Frame.CanGoBack)
                 Frame.GoBack();
         }
 
-
+        public void NavToFav()
+        {
+            FrameNavigationOptions navOptions = new FrameNavigationOptions();
+            navOptions.IsNavigationStackEnabled = false;
+            var pageType = typeof(SettingsPage_Favorites);
+            settingsNavView.Header = "Favotites";
+            contentFrame.NavigateToType(pageType, null, navOptions);
+        }
         private void settingsNavView_SelectionChanged(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewSelectionChangedEventArgs args)
         {
             FrameNavigationOptions navOptions = new FrameNavigationOptions();

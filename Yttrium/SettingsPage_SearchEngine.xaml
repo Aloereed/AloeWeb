@@ -9,6 +9,27 @@
       winui:BackdropMaterial.ApplyToRootOrPageBackground="True">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="8*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="30,0,0,0">
+            <TextBlock FontSize="24">New Page</TextBlock>
+                <RadioButton x:Name="BingNew" GroupName="Newtabs" Content="Bing (like Edge)" IsChecked="True" Click="RadioButton_Click"/>
+            <RadioButton x:Name="GoogleNew" GroupName="Newtabs" Content="Google" Click="GoogleNew_Click"/>
+            <RadioButton x:Name="BaiduNew" GroupName="Newtabs" Content="Baidu" Click="BaiduNew_Click"/>
+            <RadioButton x:Name="YandexNew" GroupName="Newtabs" Content="Yandex" Click="YandexNew_Click"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="30,0,0,0">
+            <TextBlock FontSize="24">Home Page</TextBlock>
+            <RadioButton x:Name="HomeasTab" GroupName="hometabs" Content="Same as New Tab page" IsChecked="True" Click="HomeasTab_Click"/>
+            <RadioButton x:Name="CustomHome" GroupName="hometabs" Content="Custom Homepage" Click="CustomHome_Click"/>
+            <TextBox x:Name="CustomHomePage" IsEnabled="False" TextChanged="CustomHomePage_TextChanged"></TextBox>
+        </StackPanel>
+
 
     </Grid>
 </Page>

@@ -12,7 +12,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
+using BookmarksManager;
+using Windows.UI.Xaml.Shapes;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace AloeWeb_browser
@@ -25,6 +26,46 @@ namespace AloeWeb_browser
         public SettingsPage_Favorites()
         {
             this.InitializeComponent();
+        }
+
+        private void SetFavList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            MainPage.SuspendInfo.waitToOpen = ((BookmarkLink)(e.ClickedItem)).Url;
+            Common.outFrame.Navigate(typeof(MainPage));
+        }
+
+        private void FontIcon_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
+
+        private void SetFavList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            try
+            {
+                FrameworkElement b = (FrameworkElement)e.OriginalSource;
+                MainPage.SuspendInfo.waitToOpen = ((BookmarkLink)(b.DataContext)).Url;
+            }catch(Exception ex)
+            {
+                try
+                {
+                    var b = (TextBlock)e.OriginalSource;
+                    MainPage.SuspendInfo.waitToOpen = ((BookmarkLink)(b.DataContext)).Url;
+                }catch(Exception ex2)
+                {
+                    Ellipse b = (Ellipse)e.OriginalSource;
+                    MainPage.SuspendInfo.waitToOpen = ((BookmarkLink)(b.DataContext)).Url;
+                }
+            }
+            Common.outFrame.Navigate(typeof(MainPage));
+        }
+
+        private void RemoveFavs_Click(object sender, RoutedEventArgs e)
+        {
+            foreach(var bl in SetFavList.SelectedItems)
+            {
+                Common.bookmarkEdit.Remove((BookmarkLink)bl);
+            }
         }
     }
 }

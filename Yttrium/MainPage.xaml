@@ -94,6 +94,39 @@
                     <FontIcon Glyph="&#xE80F;"
                               FontSize="15" />
                 </Button>
+                <Button x:Name="FavButton"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Click="FavButton_Click"
+                        Padding="8.5">
+                    <Button.Flyout>
+                        <MenuFlyout x:Name="FavList">
+                            <!-- fav button -->
+                            <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                            <MenuFlyoutItem x:Uid ="ManFav" x:Name="ManFav" Click="ManFav_Click">Manage Favorites</MenuFlyoutItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+
+                    <FontIcon Glyph="&#xE728;"
+                          FontSize="15" />
+
+                </Button>
+                <Button x:Name="HistoryButton"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="8.5">
+                    <Button.Flyout>
+                        <MenuFlyout >
+                            <!-- his button -->
+                            <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                            <MenuFlyoutItem>Manage Browsing Histories</MenuFlyoutItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+
+                    <FontIcon Glyph="&#xE81C;"
+                          FontSize="15" />
+
+                </Button>
             </StackPanel>
 
             <!-- SSL certification icon-->
@@ -113,18 +146,40 @@
             </Button>
 
             <!-- search bar -->
-            <TextBox x:Name="SearchBar"
+            <AutoSuggestBox x:Name="SearchBar"
                      KeyDown="SearchBar_KeyDown"
                      VerticalAlignment="Top"
                      Margin="8,10,0,0"
                      BorderThickness="0"
-                     IsSpellCheckEnabled="False"
                      Grid.Column="2"
                      PlaceholderText="Search..."
-                     Height="25"
+                     Height="32"
                      VerticalContentAlignment="Center"
                      Grid.Row="0"
-                     GotFocus="SearchBar_GotFocus"/>
+                     GotFocus="SearchBar_GotFocus"
+                     LostFocus="SearchBar_LostFocus"
+                     TextChanged="SearchBar_TextChanged"
+                     QuerySubmitted="SearchBar_QuerySubmitted"
+                     SuggestionChosen="SearchBar_SuggestionChosen"
+                     >
+            </AutoSuggestBox>
+            <Button x:Name="AddFavButton"
+                        Background="Transparent"
+                        BorderThickness="0"
+                    Click="AddFavButton_Click"
+                    Grid.Column="3"
+                        Margin="-30,5,0,0"
+                        Padding="8.5"
+                    AccessKey="D"
+                    >
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator 
+                        Modifiers="Control" 
+                        Key="D" />
+                </Button.KeyboardAccelerators>
+                <FontIcon x:Name="AddFavIcon" Glyph="&#xE734;"
+                              FontSize="15" />
+            </Button>
 
             <!-- settings flyout -->
             <Button x:Name="MenuButton"
@@ -138,6 +193,32 @@
                 <Button.Flyout>
                     <MenuFlyout>
                         <!-- settings button -->
+                        <MenuFlyoutItem x:Name="CreateWindowMenuItem"
+                                        Text="Create a New Window"
+                                        Click="CreateWindowMenuItem_Click"
+                                        AccessKey="N">
+                            <MenuFlyoutItem.KeyboardAccelerators>
+                                <KeyboardAccelerator 
+                                    Modifiers="Control" 
+                                    Key="N" />
+                            </MenuFlyoutItem.KeyboardAccelerators>
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE78B;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Name="CreateTabMenuItem"
+                                        Text="Create a New Tab"
+                                        Click="CreateTabMenuItem_Click"
+                                        AccessKey="T">
+                            <MenuFlyoutItem.KeyboardAccelerators>
+                                <KeyboardAccelerator 
+                                    Modifiers="Control" 
+                                    Key="T" />
+                            </MenuFlyoutItem.KeyboardAccelerators>
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xED0E;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutItem x:Name="DownloadMenuItem"
                                         Text="Downloads"
                                         Click="DownloadMenuItem_Click">
@@ -183,18 +264,25 @@
                            VerticalAlignment="Stretch"
                            AddTabButtonClick="Tabs_AddTabButtonClick"
                            TabCloseRequested="Tabs_TabCloseRequested"
-                           SelectionChanged="Tabs_SelectionChanged">
+                           SelectionChanged="Tabs_SelectionChanged"
+                           >
                 <winui:TabView.TabStripHeader>
                     <Grid/>
                 </winui:TabView.TabStripHeader>
                 <winui:TabView.TabStripFooter>
-                    <Grid/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="197*"/>
+                            <ColumnDefinition Width="1014*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
                 </winui:TabView.TabStripFooter>
                 <winui:TabViewItem x:Name="FirstTab" Header="Blank" winui:BackdropMaterial.ApplyToRootOrPageBackground="True">
                     <Frame x:Name="FirstTabContent">
                         <!-- webview -->
                         <winui:WebView2 NavigationStarting="WebBrowser_NavigationStarting"
                                     NavigationCompleted="WebBrowser_NavigationCompleted"
+                                    
                                     x:Name="FirstWebBrowser"
                                     Visibility="Visible"
                                     Source="https://google.com/"/>
