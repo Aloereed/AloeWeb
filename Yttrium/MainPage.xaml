@@ -149,6 +149,7 @@
             <AutoSuggestBox x:Name="SearchBar"
                      KeyDown="SearchBar_KeyDown"
                      VerticalAlignment="Top"
+                     
                      Margin="8,10,0,0"
                      BorderThickness="0"
                      Grid.Column="2"

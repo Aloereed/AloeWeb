@@ -77,8 +77,18 @@ namespace AloeWeb_browser
             };
             
             initFav();
-            
-
+            string hp = (string)localSettings.Values["homepage"];
+            if (hp is null || hp == "")
+            {
+                string nt = (string)localSettings.Values["newtab"];
+                if (nt is null || nt == "")
+                    WebBrowser.Source = new Uri("https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title=" + "New Tab");
+                else
+                    WebBrowser.Source = new Uri(nt);
+            }
+                
+            else
+                WebBrowser.Source = new Uri((string)localSettings.Values["homepage"]);
         }
         private async void initFav()
         {
@@ -251,6 +261,7 @@ namespace AloeWeb_browser
                 char c = (char)0xE734;
                 AddFavIcon.Glyph = c.ToString();
             }
+
             //            await WebBrowser.EnsureCoreWebView2Async();
             //            await WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"
             //document.addEventListener('DOMContentLoaded', function() {
