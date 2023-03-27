@@ -116,6 +116,7 @@ namespace AloeWeb_browser
             if (args.Kind == ActivationKind.Protocol)
             {
                 ProtocolActivatedEventArgs eventArgs = args as ProtocolActivatedEventArgs;
+                Common.openurl = eventArgs.Uri.AbsoluteUri;
                 // TODO: Handle URI activation
                 // The received URI is eventArgs.Uri.AbsoluteUri
                 Frame rootFrame = Window.Current.Content as Frame;
@@ -154,6 +155,7 @@ namespace AloeWeb_browser
 
                     titleBar.ButtonBackgroundColor = Colors.Transparent;
                 }
+                
             }
         }
     }

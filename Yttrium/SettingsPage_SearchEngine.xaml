@@ -14,6 +14,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="30,0,0,0">
@@ -29,7 +30,13 @@
             <RadioButton x:Name="CustomHome" GroupName="hometabs" Content="Custom Homepage" Click="CustomHome_Click"/>
             <TextBox x:Name="CustomHomePage" IsEnabled="False" TextChanged="CustomHomePage_TextChanged"></TextBox>
         </StackPanel>
-
+        <StackPanel Grid.Row="2" Margin="30,0,0,0">
+            <TextBlock FontSize="24">Search Engine</TextBlock>
+            <RadioButton x:Name="Bing" GroupName="earch" Content="Bing" IsChecked="True" Click="Bing_Click"/>
+            <RadioButton x:Name="Google" GroupName="earch" Content="Google" Click="Google_Click"/>
+            <RadioButton x:Name="Baidu" GroupName="earch" Content="Baidu" Click="Baidu_Click"/>
+            <RadioButton x:Name="Yandex" GroupName="earch" Content="Yandex" Click="Yandex_Click"/>
+        </StackPanel>
 
     </Grid>
 </Page>

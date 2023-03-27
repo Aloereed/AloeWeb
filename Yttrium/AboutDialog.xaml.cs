@@ -27,7 +27,7 @@ namespace AloeWeb
 
         private async void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            await Launcher.LaunchUriAsync(new Uri("https://t.me/AloeWebgroup"));
+            await Launcher.LaunchUriAsync(new Uri("https://go.microsoft.com/fwlink/p/?LinkId=2124703"));
         }
     }
 }

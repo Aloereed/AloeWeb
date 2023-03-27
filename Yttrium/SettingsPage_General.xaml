@@ -1,0 +1,40 @@
+﻿<Page x:Class="AloeWeb_browser.SettingsPage_General"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:AloeWeb_browser"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+      winui:BackdropMaterial.ApplyToRootOrPageBackground="True">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="8*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="30,0,0,0">
+            <TextBlock FontSize="24">Profile Synchronization</TextBlock>
+                <RadioButton x:Name="uselocal" GroupName="profile" Content="Use AloeWeb's local folder" IsChecked="True" Click="uselocal_Click"/>
+                <RadioButton x:Name="useother" GroupName="profile" Content="Use your specified folder" Click="useother_Click"/>
+            <TextBox x:Name="Customprofile" IsEnabled="False" TextChanged="Customprofile_TextChanged" PlaceholderText="Path of your specified folder"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="30,0,0,0">
+            <TextBlock FontSize="24">Downloader</TextBlock>
+            <RadioButton x:Name="useEmbeddedDownloader" GroupName="downloader" Content="Use Embbeded Downloader" IsChecked="True" Click="useEmbeddedDownloader_Click"/>
+            <RadioButton x:Name="useFDM" GroupName="downloader" Content="Use Free Download Manager" Click="useFDM_Click"/>
+            <TextBox x:Name="CustomDownloader" IsEnabled="False" TextChanged="CustomDownloader_TextChanged" PlaceholderText="Path of FDM.exe"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Margin="30,0,0,0">
+            <TextBlock FontSize="24">OpenAI Settings</TextBlock>
+            <RadioButton x:Name="usenogpt" GroupName="openai" Content="Do not use AI to enhance my browsing experience." IsChecked="True" Click="usenogpt_Click"/>
+            <RadioButton x:Name="usegpt" GroupName="openai" Content="Use AI to enhance my browsing experience." Click="usegpt_Click"/>
+            <TextBox x:Name="CustomAPI" IsEnabled="False" PlaceholderText="OpenAI API key" TextChanged="CustomAPI_TextChanged"></TextBox>
+        </StackPanel>
+
+    </Grid>
+</Page>

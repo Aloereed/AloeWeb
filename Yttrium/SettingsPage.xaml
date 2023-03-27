@@ -42,7 +42,12 @@
                               IsSettingsVisible="False"
                               SelectionChanged="settingsNavView_SelectionChanged">
             <winui:NavigationView.MenuItems>
-
+                <winui:NavigationViewItem Content="General"
+                                          x:Name="GeneralItem">
+                    <winui:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xEC25;" />
+                    </winui:NavigationViewItem.Icon>
+                </winui:NavigationViewItem>
                 <winui:NavigationViewItem Content="Favorites"
                                           x:Name="FavoritesItem">
                     <winui:NavigationViewItem.Icon>

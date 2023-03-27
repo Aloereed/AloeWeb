@@ -5,22 +5,26 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
-      xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+      xmlns:winui="using:Microsoft.UI.Xaml.Controls" xmlns:bk="using:BookmarksManager"
       winui:BackdropMaterial.ApplyToRootOrPageBackground="True">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="0" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <Grid x:Name="HistoryListGrid"
               Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="32" />
+                <RowDefinition Height="48" />
                 <RowDefinition />
             </Grid.RowDefinitions>
-
+            <StackPanel Orientation="Horizontal" Margin="16,10,10,0">
+                <Button Margin="5,0,0,0" x:Name="RemoveAllHis" Click="RemoveAllHis_Click">Remove all histories</Button>
+                <Button Margin="5,0,0,0" x:Name="RemoveAllCookies" Click="RemoveAllCookies_Click">Remove all cookies</Button>
+            </StackPanel>
+            
             <!-- Card -->
             <Border  Grid.Row="1"
                      Background="{ThemeResource LayerFillColorDefaultBrush}"
@@ -34,14 +38,49 @@
                                 Margin="10,10,10,10"
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Stretch"
-                                VerticalAlignment="Stretch">
+                                VerticalAlignment="Stretch"
+                                IsExpanded="True">
 
                     <winui:Expander.Content>
                         <!-- Listview with history items -->
-                        <ListView x:Name="HistoryListView">
-                            <ListViewItem Content="Google.com"
-                                          Background="{ThemeResource LayerFillColorAltBrush}" />
-                        </ListView>
+                        <Grid>
+                            <ListView x:Name="SetHisList" ItemsSource="{x:Bind local:Common.historyEdit}"
+                  ItemClick="SetHisList_ItemClick" 
+                  DoubleTapped="SetHisList_DoubleTapped"
+                  AllowDrop="True" 
+                  IsSwipeEnabled="true"
+                  SelectionMode="Multiple"
+                  ReorderMode="Enabled"
+                  CanReorderItems="True"
+                  IsItemClickEnabled="False">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:Name="DoubleLineDataTemplate" x:DataType="bk:BookmarkLink">
+                                        <SwipeControl>
+                                            <StackPanel Orientation="Horizontal" Height="64" AutomationProperties.Name="{x:Bind Title}">
+                                                <Ellipse Height="48" Width="48" VerticalAlignment="Center">
+                                                    <Ellipse.Fill>
+                                                        <ImageBrush ImageSource="{x:Bind IconUrl}"/>
+                                                    </Ellipse.Fill>
+                                                </Ellipse>
+                                                <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="12,0,0,0">
+                                                    <TextBlock Text="{x:Bind Title}"  Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" />
+                                                    <TextBlock Text="{x:Bind Url}" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                                                    <TextBlock Text="{x:Bind LastVisit}" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                                                </StackPanel>
+
+                                            </StackPanel>
+                                        </SwipeControl>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <Button x:Name="RemoveHiss" VerticalAlignment="Top" HorizontalAlignment="Right" Click="RemoveHiss_Click">
+                                <FontIcon Glyph="&#xE74D;"
+                                  HorizontalAlignment="Right"
+                                  x:Name="RemoveFav"
+                                  Tapped="FontIcon_Tapped"
+                              FontSize="15" />
+                            </Button>
+                        </Grid>
                     </winui:Expander.Content>
                 </winui:Expander>
             </Border>

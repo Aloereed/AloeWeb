@@ -25,7 +25,7 @@ namespace AloeWeb_browser
         public SettingsPage()
         {
             this.InitializeComponent();
-            settingsNavView.SelectedItem = FavoritesItem;
+            settingsNavView.SelectedItem = GeneralItem;
             currSet = this;
         }
         public static SettingsPage currSet;
@@ -41,6 +41,14 @@ namespace AloeWeb_browser
             navOptions.IsNavigationStackEnabled = false;
             var pageType = typeof(SettingsPage_Favorites);
             settingsNavView.Header = "Favotites";
+            contentFrame.NavigateToType(pageType, null, navOptions);
+        }
+        public void NavToHis()
+        {
+            FrameNavigationOptions navOptions = new FrameNavigationOptions();
+            navOptions.IsNavigationStackEnabled = false;
+            var pageType = typeof(SettingsPage_History);
+            settingsNavView.Header = "History";
             contentFrame.NavigateToType(pageType, null, navOptions);
         }
         private void settingsNavView_SelectionChanged(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewSelectionChangedEventArgs args)
@@ -59,6 +67,11 @@ namespace AloeWeb_browser
             {
                 pageType = typeof(SettingsPage_History);
                 settingsNavView.Header = "History";
+            }
+            else if (args.SelectedItem == GeneralItem)
+            {
+                pageType = typeof(SettingsPage_General) ;
+                settingsNavView.Header = "General";
             }
             else if (args.SelectedItem == SearchEngineItem)
             {

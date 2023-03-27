@@ -33,6 +33,9 @@ using Windows.System;
 using Windows.UI.Input.Preview.Injection;
 using Windows.ApplicationModel;
 using System.Diagnostics;
+using OpenAI_API;
+using Windows.Media.Capture;
+using static System.Net.WebRequestMethods;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace AloeWeb_browser
@@ -44,20 +47,28 @@ namespace AloeWeb_browser
     {
         public static BookmarkFolder bookmarks;
         public static ObservableCollection<BookmarkLink> bookmarkEdit;
+        public static BookmarkFolder history;
+        public static ObservableCollection<BookmarkLink> historyEdit;
         public static Frame outFrame;
+        public static string openurl;
     };
     public sealed partial class MainPage : Page
     {
         BookmarkFolder bk;
         ObservableCollection<BookmarkLink> bkE;
+        BookmarkFolder his;
+        ObservableCollection<BookmarkLink> hisE;
         string OriginalUserAgent;
         string GoogleSignInUserAgent;
         WebView2 WebBrowser;
         Frame TabContent;
         TabViewItem CurrTab;
         IList<MenuFlyoutItemBase> baseFavList;
+        IList<MenuFlyoutItemBase> baseHisList;
         HashSet<string> favurls;
+        HashSet<string> hisurls;
         ApplicationDataContainer localSettings;
+        List<WebView2> webView2s=new List<WebView2>();
         public MainPage()
         {
             this.InitializeComponent();
@@ -66,6 +77,7 @@ namespace AloeWeb_browser
             SettingsData settings = new SettingsData();
             settings.CreateSettingsFile();
             WebBrowser = FirstWebBrowser;
+            webView2s.Add(WebBrowser);
             TabContent = FirstTabContent;
             CurrTab = FirstTab;
             //google login fix
@@ -77,28 +89,111 @@ namespace AloeWeb_browser
             };
             
             initFav();
-            string hp = (string)localSettings.Values["homepage"];
-            if (hp is null || hp == "")
+
+            if (Common.openurl is null)
             {
-                string nt = (string)localSettings.Values["newtab"];
-                if (nt is null || nt == "")
-                    WebBrowser.Source = new Uri("https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title=" + "New Tab");
+                string hp = (string)localSettings.Values["homepage"];
+                if (hp is null || hp == "")
+                {
+                    string nt = (string)localSettings.Values["newtab"];
+                    if (nt is null || nt == "")
+                        WebBrowser.Source = new Uri("https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title=" + "New Tab");
+                    else
+                        WebBrowser.Source = new Uri(nt);
+                }
                 else
-                    WebBrowser.Source = new Uri(nt);
+                    WebBrowser.Source = new Uri((string)localSettings.Values["homepage"]);
+
             }
-                
             else
-                WebBrowser.Source = new Uri((string)localSettings.Values["homepage"]);
+            {
+                try
+                {
+                    if (Common.openurl.Contains("aloeweb://"))
+                    {
+                        string hp = (string)localSettings.Values["homepage"];
+                        if (hp is null || hp == "")
+                        {
+                            string nt = (string)localSettings.Values["newtab"];
+                            if (nt is null || nt == "")
+                                WebBrowser.Source = new Uri("https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title=" + "New Tab");
+                            else
+                                WebBrowser.Source = new Uri(nt);
+                        }
+                        else
+                            WebBrowser.Source = new Uri((string)localSettings.Values["homepage"]);
+                    }
+                    else
+                    {
+                        WebBrowser.Source = new Uri(Common.openurl);
+                    }
+                }catch(Exception ex)
+                {
+                    WebBrowser.Source = new Uri("https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title=" + "New Tab");
+                }
+                Common.openurl = null;
+            }
+
+
         }
+
+        private void CoreWebView2_DownloadStarting(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs args)
+        {
+            Deferral deferral = args.GetDeferral();
+
+            // We avoid potential reentrancy from running a message loop in the download
+            // starting event handler by showing our download dialog later when we
+            // complete the deferral asynchronously.
+            System.Threading.SynchronizationContext.Current.Post(async(_) =>
+            {
+                using (deferral)
+                {
+                    // Hide the default download dialog.
+                    args.Handled = true;
+                    var comm = "/c \"" + localSettings.Values["downloader"] + "\" " + args.DownloadOperation.Uri + " ";
+                    await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppWithArgumentsAsync(comm);
+                    args.Cancel = true;
+                    //var dialog = new TextInputDialog(
+                    //    title: "Download Starting",
+                    //    description: "Enter new result file path or select OK to keep default path. Select cancel to cancel the download.",
+                    //    defaultInput: args.ResultFilePath);
+                    //if (dialog.ShowDialog() == true)
+                    //{
+                    //    args.ResultFilePath = dialog.Input.Text;
+                    //    UpdateProgress(args.DownloadOperation);
+                    //}
+                    //else
+                    //{
+                    //    args.Cancel = true;
+                    //}
+                }
+            }, null);
+        }
+
         private async void initFav()
         {
+            var firstuse = (string)localSettings.Values["firstuse"];
+
             try
             {
                 // Read data from a simple setting.
-                StorageFolder folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                var profile = (string)(localSettings.Values["profile"]);
+                StorageFolder folder;
+                if (profile is null || profile == "")
+                     folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                else
+                {
+                    try
+                    {
+                        folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                    }catch (Exception ex)
+                    {
+                        folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                    }
+                }
                 Console.WriteLine(folder.Path);
                 StorageFile favfile = await folder.GetFileAsync("fav.list");
-                using (var file = File.OpenRead(favfile.Path))
+                using (var file = await favfile.OpenStreamForWriteAsync())
                 {
                     var reader = new NetscapeBookmarksReader();
                     //supports encoding detection when reading from stream
@@ -115,22 +210,33 @@ namespace AloeWeb_browser
                 AloeWeb_browser.Common.bookmarks = new BookmarkFolder();
                 StorageFile favFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
                 var writter = new NetscapeBookmarksWriter(AloeWeb_browser.Common.bookmarks);
-                using (var file = File.OpenWrite(favFile.Path))
+                using (var file = await favFile.OpenStreamForWriteAsync())
                 {
                     writter.Write(file);
                 }
                 Console.WriteLine(favFile.Path);
             }
             bk = AloeWeb_browser.Common.bookmarks;
-            
+            favurls = new HashSet<string>();
             await WebBrowser.EnsureCoreWebView2Async();
             WebBrowser.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
-            favurls = new HashSet<string>();
+            
             foreach (var b in bk.AllLinks)
             {
                 favurls.Add(b.Url);
             }
             Common.bookmarkEdit = new ObservableCollection<BookmarkLink>();
+            //localSettings.Values["search"] = "https://www.google.com/search?q=";
+            if (firstuse is null)
+            {
+                var tmp = new BookmarkLink("https://www.aloereed.com", "Aloereed");
+                tmp.IconUrl = "https://www.google.com/s2/favicons?sz=64&domain_url=https://www.aloereed.com";
+                bk.Add(tmp);
+                localSettings.Values["search"] = "https://www.google.com/search?q=";
+                ContentDialog aboutdialog = new AboutDialog();
+                var result = await aboutdialog.ShowAsync();
+                localSettings.Values["firstuse"] = "notfirst";
+            }
             bkE = Common.bookmarkEdit;
             foreach (var b in bk.AllLinks)
             {
@@ -138,8 +244,108 @@ namespace AloeWeb_browser
             }
          
             Common.bookmarkEdit.CollectionChanged += BookmarkEdit_CollectionChanged;
-        }
 
+            localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            string fb = (string)localSettings.Values["favbar"];
+            if (fb is null || fb == "true")
+            {
+                Tabs.SetValue(Grid.RowProperty, 2);
+                Tabs.SetValue(Grid.RowSpanProperty, 1);
+                FavBar.Visibility = Visibility.Visible;
+                FavBarMenuItem.IsChecked = true;
+            }
+            else
+            {
+                Tabs.SetValue(Grid.RowProperty, 1);
+                Tabs.SetValue(Grid.RowSpanProperty, 2);
+                FavBar.Visibility = Visibility.Collapsed;
+            }
+
+            initHis();
+            await WebBrowser.EnsureCoreWebView2Async();
+            if(!((localSettings.Values["downloader"] is null) || ((string)localSettings.Values["downloader"]=="")))
+                WebBrowser.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
+        }
+        private async void initHis()
+        {
+            try
+            {
+                // Read data from a simple setting.
+                var profile = (string)(localSettings.Values["profile"]);
+                StorageFolder folder;
+                if (profile is null || profile == "")
+                    folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                else
+                {
+                    try
+                    {
+                        folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                    }
+                    catch (Exception ex)
+                    {
+                        folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                    }
+                }
+                Console.WriteLine(folder.Path);
+                StorageFile favfile = await folder.GetFileAsync("his.list");
+                using (var file = await favfile.OpenStreamForWriteAsync())
+                {
+                    var reader = new NetscapeBookmarksReader();
+                    //supports encoding detection when reading from stream
+                    AloeWeb_browser.Common.history = reader.Read(file);
+                }
+                Console.WriteLine(favfile.Path);
+                if (AloeWeb_browser.Common.history is null)
+                {
+                    AloeWeb_browser.Common.history = new BookmarkFolder();
+                }
+            }
+            catch (Exception)
+            {
+                AloeWeb_browser.Common.history = new BookmarkFolder();
+                var profile = (string)(localSettings.Values["profile"]);
+                StorageFolder folder;
+                if (profile is null || profile == "")
+                    folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                else
+                {
+                    try
+                    {
+                        folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                    }
+                    catch (Exception ex)
+                    {
+                        folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                    }
+                }
+                try
+                {
+                    StorageFile favFile = await folder.CreateFileAsync("his.list", CreationCollisionOption.ReplaceExisting);
+                    var writter = new NetscapeBookmarksWriter(AloeWeb_browser.Common.history);
+                    using (var file = await favFile.OpenStreamForWriteAsync())
+                    {
+                        writter.Write(file);
+                    }
+                    Console.WriteLine(favFile.Path);
+                }catch(Exception ex) { }
+            }
+            his = AloeWeb_browser.Common.history;
+            hisurls = new HashSet<string>();
+            await WebBrowser.EnsureCoreWebView2Async();
+            
+            foreach (var b in his.AllLinks)
+            {
+                hisurls.Add(b.Url);
+            }
+            Common.historyEdit = new ObservableCollection<BookmarkLink>();
+            hisE = Common.historyEdit;
+            foreach (var b in his.AllLinks)
+            {
+                Common.historyEdit.Add(b);
+            }
+
+            Common.historyEdit.CollectionChanged += HistoryEdit_CollectionChanged;
+        }
         private async void BookmarkEdit_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             var col = (ObservableCollection<BookmarkLink>)(sender);
@@ -150,14 +356,72 @@ namespace AloeWeb_browser
                 bk.Add(b);
                 favurls.Add(b.Url);
             }
-            StorageFile favFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
-            var writter = new NetscapeBookmarksWriter(bk);
-            using (var file = File.OpenWrite(favFile.Path))
+            var profile = (string)(localSettings.Values["profile"]);
+            StorageFolder folder;
+            if (profile is null || profile == "")
+                folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            else
             {
-                writter.Write(file);
+                try
+                {
+                    folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                }
+                catch (Exception ex)
+                {
+                    folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                }
             }
+            try
+            {
+                StorageFile favFile = await folder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
+                var writter = new NetscapeBookmarksWriter(bk);
+                using (var file = await favFile.OpenStreamForWriteAsync())
+                {
+                    writter.Write(file);
+                }
+            }
+            catch(Exception ex) { 
+            }
+            this.Bindings.Update();
 
-            
+
+        }
+        private async void HistoryEdit_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            var col = (ObservableCollection<BookmarkLink>)(sender);
+            his.Clear();
+            hisurls?.Clear();
+            foreach (var b in col)
+            {
+                his.Add(b);
+                hisurls.Add(b.Url);
+            }
+            var profile = (string)(localSettings.Values["profile"]);
+            StorageFolder folder;
+            if (profile is null || profile == "")
+                folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            else
+            {
+                try
+                {
+                    folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                }
+                catch (Exception ex)
+                {
+                    folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                }
+            }
+            try
+            {
+                StorageFile favFile = await folder.CreateFileAsync("his.list", CreationCollisionOption.ReplaceExisting);
+                var writter = new NetscapeBookmarksWriter(his);
+                using (var file = await favFile.OpenStreamForWriteAsync())
+                {
+                    writter.Write(file);
+                }
+            }catch(Exception ex) { }
+
+
         }
 
 
@@ -193,6 +457,7 @@ namespace AloeWeb_browser
         private void WebBrowser_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
         {
             //website load status
+            this.Bindings.Update();
             try
             {
                 sender.CoreWebView2.Settings.IsStatusBarEnabled = false;
@@ -250,32 +515,35 @@ namespace AloeWeb_browser
                 ToolTipService.SetToolTip(SSLButton, tooltip);
 
             }
-
-            if (favurls.Contains(WebBrowser.Source.AbsoluteUri))
+            try
             {
-                char c = (char)0xE735;
-                AddFavIcon.Glyph= c.ToString();
-            }
-            else
-            {
-                char c = (char)0xE734;
-                AddFavIcon.Glyph = c.ToString();
-            }
-
-            //            await WebBrowser.EnsureCoreWebView2Async();
-            //            await WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"
-            //document.addEventListener('DOMContentLoaded', function() {
-            //  const style = document.createElement('style');
-            //  style.textContent = '/* width */ \
-            //::-webkit-scrollbar { \
-            //  width: 20px !important; \
-            //} \
-            // \
-            //::-webkit-scrollbar-track { \
-            //  background: red !important; \
-            //}';
-            //  document.head.append(style);
-            //}, false);");
+                if (favurls.Contains(WebBrowser.Source.AbsoluteUri))
+                {
+                    char c = (char)0xE735;
+                    AddFavIcon.Glyph = c.ToString();
+                }
+                else
+                {
+                    char c = (char)0xE734;
+                    AddFavIcon.Glyph = c.ToString();
+                }
+                AddHisButton_Click();
+                BookmarkEdit_CollectionChanged(bkE, null);
+                //            await WebBrowser.EnsureCoreWebView2Async();
+                //            await WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"
+                //document.addEventListener('DOMContentLoaded', function() {
+                //  const style = document.createElement('style');
+                //  style.textContent = '/* width */ \
+                //::-webkit-scrollbar { \
+                //  width: 20px !important; \
+                //} \
+                // \
+                //::-webkit-scrollbar-track { \
+                //  background: red !important; \
+                //}';
+                //  document.head.append(style);
+                //}, false);");
+            }catch(Exception ex) { }
         }
 
         private void CoreWebView2_ServerCertificateErrorDetected(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2ServerCertificateErrorDetectedEventArgs args)
@@ -327,6 +595,8 @@ namespace AloeWeb_browser
         }
         public static bool IsUrl(string str)
         {
+            if (str.Length>10 && (str.Substring(0, 8) == "file:///" || str.Substring(0, 10) == "aloeweb://"))
+                return true;
             try
             {
                 string Url = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
@@ -347,14 +617,16 @@ namespace AloeWeb_browser
         {
             if (IsUrl(SearchBar.Text))
             {
-                if(!SearchBar.Text.Contains("http"))
+                if (SearchBar.Text.Length>10 &&(SearchBar.Text.Substring(0, 8) == "file:///" || SearchBar.Text.Substring(0, 10) == "aloeweb://"))
+                    WebBrowser.CoreWebView2.Navigate(SearchBar.Text);
+                else if (!SearchBar.Text.Contains("http"))
                     WebBrowser.Source = new Uri("http://"+SearchBar.Text);
                 else
                     WebBrowser.Source = new Uri(SearchBar.Text);
             }
             else
             {
-                WebBrowser.Source = new Uri("https://www.google.com/search?q=" + SearchBar.Text);
+                WebBrowser.Source = new Uri(localSettings.Values["search"]  + SearchBar.Text);
             }
             //string link = "https://" + SearchBar.Text;
             //WebBrowser.CoreWebView2.Navigate(link);
@@ -428,6 +700,10 @@ namespace AloeWeb_browser
         {
             WebView2 webView = new WebView2();
             await webView.EnsureCoreWebView2Async();
+            var downloader = Windows.Storage.ApplicationData.Current.LocalSettings.Values["downloader"];
+            if (!((downloader is null) || ((string)downloader == "")))
+                webView.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
+            webView2s.Add(webView);
             webView.NavigationStarting += WebBrowser_NavigationStarting;
             webView.NavigationCompleted += WebBrowser_NavigationCompleted;
             webView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
@@ -460,6 +736,9 @@ namespace AloeWeb_browser
         {
             WebView2 webView = new WebView2();
             await webView.EnsureCoreWebView2Async();
+            var downloader = Windows.Storage.ApplicationData.Current.LocalSettings.Values["downloader"];
+            if (!((downloader is null) || ((string)downloader == "")))
+                webView.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
             webView.NavigationStarting += WebBrowser_NavigationStarting;
             webView.NavigationCompleted += WebBrowser_NavigationCompleted;
             webView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
@@ -500,8 +779,17 @@ namespace AloeWeb_browser
         {
             if (sender.TabItems.Count <= 1)
                 Tabs_AddTabButtonClick(sender, args);
+            try
+            {
+                ((WebView2)((Frame)(args.Tab.Content)).Content).Close();
+                webView2s.Remove(((WebView2)((Frame)(args.Tab.Content)).Content));
+            }
+            catch(Exception ex)
+            {
 
+            }
             sender.TabItems.Remove(args.Tab);
+            
         }
         //opens about app dialog
         private async void AboutMenuItem_Click(object sender, RoutedEventArgs e)
@@ -542,6 +830,7 @@ namespace AloeWeb_browser
         {
             WebBrowser.CoreWebView2.OpenDevToolsWindow();
             WebBrowser.CoreWebView2.OpenTaskManagerWindow();
+            
         }
 
         private void SearchBar_LostFocus(object sender, RoutedEventArgs e)
@@ -602,21 +891,101 @@ namespace AloeWeb_browser
                     }
                 }
             }
-
-            
-
+        }
+        private async void AddHisButton_Click()
+        {
+            try
+            {
+                if (true)
+                {
+                    var newBK = new BookmarkLink(WebBrowser.Source.AbsoluteUri, WebBrowser.CoreWebView2.DocumentTitle.ToString());
+                    newBK.LastVisit = DateTime.Now;
+                    newBK.IconUrl = "https://www.google.com/s2/favicons?sz=64&domain_url=" + WebBrowser.Source;
+                    //hisE.Add(newBK);
+                    hisE.Insert(0, newBK);
+                }
+            }catch(Exception ex) { }
         }
 
-
-        private void SearchBar_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private async void SearchBar_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            try
             {
-                //Set the ItemsSource to be your filtered dataset
-                //sender.ItemsSource = dataset;
-                var suitableItems = new List<string>();
-                suitableItems.Add("Test");
-                sender.ItemsSource = suitableItems;
+                if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+                {
+                    //Set the ItemsSource to be your filtered dataset
+                    //sender.ItemsSource = dataset;
+                    var curtext = sender.Text;
+                    var suitableItems = new List<BookmarkLink>();
+                    var suitableItemsUrl = new List<string>();
+                    foreach (var b in his.AllLinks)
+                    {
+                        if (b.Url.Contains(curtext) || b.Title.Contains(curtext))
+                        {
+                            if (suitableItems.Count < 5 && !suitableItemsUrl.Contains(b.Url))
+                            {
+                                suitableItems.Add(b);
+                                suitableItemsUrl.Add(b.Url);
+                            }
+
+                        }
+                    }
+                    var key = (string)localSettings.Values["openaikey"];
+                    if (!(key is null || key == ""))
+                    {
+                        if (curtext.Length == 0)
+                        {
+                            sender.ItemsSource = suitableItems;
+                            return;
+                        }
+                        if (curtext.Last() == '?' || curtext.Last() == '£¿')
+                        {
+                            curtext = curtext.Substring(0, curtext.Length - 1);
+                            if (curtext.Length == 0)
+                            {
+                                sender.ItemsSource = suitableItems;
+                                return;
+                            }
+                            OpenAIAPI api = new OpenAIAPI(key);
+                            var chat = api.Chat.CreateConversation();
+
+                            /// give instruction as System
+                            chat.AppendSystemMessage("You are a powerful Internet search engine capable of generating suggested terms based on the keywords entered by the user. The next thing the user enters is a keyword and you should generate 5 suggested terms. You will only answer the terms and separate the terms with a \"|\".");
+
+                            // give a few examples as user and assistant
+                            chat.AppendUserInput("How can I");
+                            chat.AppendExampleChatbotOutput("How can I make a cake?|How can I read loudly|How can I help you|How can I call you|How can I read a book?");
+                            chat.AppendUserInput("Apple");
+                            chat.AppendExampleChatbotOutput("Apple store US|Is apple healthy?|Apple music|Apple stock|Apple id");
+
+                            // now let's ask it a question'
+                            chat.AppendUserInput(curtext);
+                            // and get the response
+                            string response = await chat.GetResponseFromChatbot();
+                            try
+                            {
+                                var terms = response.Split('|');
+                                foreach (var term in terms)
+                                {
+                                    var b = new BookmarkLink(term, "[From AI]");
+                                    suitableItems.Add(b);
+                                    suitableItemsUrl.Add(b.Url);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
+                        }
+
+                    }
+
+                    sender.ItemsSource = suitableItems;
+
+                }
+            }catch(Exception e)
+            {
+
             }
         }
 
@@ -627,7 +996,8 @@ namespace AloeWeb_browser
 
         private void SearchBar_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-
+            sender.Text = ((BookmarkLink)(args.SelectedItem)).Url;
+            Search();
         }
         static public class SuspendInfo
         {
@@ -689,6 +1059,19 @@ namespace AloeWeb_browser
                     Frame tmp = (Frame)(t.Content);
                     SuspendInfo.susUris.Add(((WebView2)(tmp.Content)).Source);
                 }
+                foreach (TabViewItem wb in Tabs.TabItems)
+                {
+                    try
+                    {
+                        ((WebView2)((Frame)(wb.Content)).Content).Close();
+
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+                webView2s.Clear();
             }
             catch (Exception)
             {
@@ -716,6 +1099,91 @@ namespace AloeWeb_browser
         private void CreateTabMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Tabs_AddTabButtonClick(Tabs, null);
+        }
+
+        private void HistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (baseHisList is null || baseHisList.Count == 0)
+            {
+                baseHisList = new List<MenuFlyoutItemBase>(HisList.Items);
+            }
+            HisList.Items.Clear();
+            hisurls.Clear();
+            var count = 0;
+            foreach (var b in his.AllLinks)
+            {
+                try
+                {
+                    count++;
+                    if (count < 50)
+                    {
+                        var tmp = new MenuFlyoutItem();
+                        tmp.Text = b.Title;
+                        var iconuri = new Uri(b.IconUrl);
+                        var tmpicon = new BitmapIcon();
+                        tmpicon.ShowAsMonochrome = false;
+                        tmpicon.UriSource = iconuri;
+                        tmp.Icon = tmpicon;
+
+                        tmp.Click += (sender1, e1) =>
+                        {
+                            SearchBar.Text = b.Url;
+                            Search();
+                        };
+                        HisList.Items.Add(tmp);
+                    }
+                    hisurls.Add(b.Url);
+                }catch(Exception ex)
+                {
+
+                }
+            }
+            
+            foreach (var bs in baseHisList)
+            {
+                HisList.Items.Add(bs);
+            }
+        }
+
+        private void FavBarMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            string fb = (string)localSettings.Values["favbar"];
+            if (fb is null || fb == "true")
+            {
+                localSettings.Values["favbar"] = "false";
+                Tabs.SetValue(Grid.RowProperty, 1);
+                Tabs.SetValue(Grid.RowSpanProperty, 2);
+                FavBar.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                localSettings.Values["favbar"] = "true";
+                Tabs.SetValue(Grid.RowProperty, 2);
+                Tabs.SetValue(Grid.RowSpanProperty, 1);
+                FavBar.Visibility = Visibility.Visible;
+
+            }
+            //FavBarMenuItem.IsChecked = !FavBarMenuItem.IsChecked;
+        }
+
+        private void FavBar_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var b = (BookmarkLink)(e.ClickedItem);
+            SearchBar.Text = b.Url;
+            Search();
+        }
+
+        private void ManBrow_Click(object sender, RoutedEventArgs e)
+        {
+            Common.outFrame = this.Frame;
+            this.Frame.Navigate(typeof(SettingsPage));
+            SettingsPage.currSet.NavToHis();
+        }
+
+        private void chat_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -8,14 +8,26 @@
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Title="About AloeWeb"
-    PrimaryButtonText="Telegram group"
+    PrimaryButtonText="Install WebView2"
     PrimaryButtonStyle="{ThemeResource AccentButtonStyle}"
     CloseButtonText="Close"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     Style="{StaticResource DefaultContentDialogStyle}">
     <Grid>
-        <TextBlock TextWrapping="Wrap">AloeWeb is a modern UWP browser with WinUI based on Edge WebView2 technology.</TextBlock>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock TextWrapping="Wrap" Grid.Row="0">AloeWeb is a lightweight UWP browser based on the  <Hyperlink NavigateUri="https://github.com/muznyo/Yttrium">
+               Yttrium
+            </Hyperlink> project and the <Hyperlink NavigateUri="https://github.com/chromium/chromium">
+               Chromium
+            </Hyperlink> project.
+        </TextBlock>
+        <TextBlock TextWrapping="Wrap" Grid.Row="1">AloeWeb relies on Edge WebView2 Runtime, so if you have problems viewing it, you will need to install it first or fix it in the settings.
+        </TextBlock>
+            
     </Grid>
 
 </ContentDialog>

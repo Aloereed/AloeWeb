@@ -4,7 +4,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
-      xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+      xmlns:winui="using:Microsoft.UI.Xaml.Controls" xmlns:bk="using:BookmarksManager" xmlns:local="using:AloeWeb_browser"
       winui:BackdropMaterial.ApplyToRootOrPageBackground="True"
       x:Name="MainWindow">
     <Page.Resources>
@@ -28,6 +28,7 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="45" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -114,12 +115,13 @@
                 <Button x:Name="HistoryButton"
                         Background="Transparent"
                         BorderThickness="0"
-                        Padding="8.5">
+                        Padding="8.5"
+                        Click="HistoryButton_Click">
                     <Button.Flyout>
-                        <MenuFlyout >
+                        <MenuFlyout x:Name="HisList">
                             <!-- his button -->
                             <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                            <MenuFlyoutItem>Manage Browsing Histories</MenuFlyoutItem>
+                            <MenuFlyoutItem x:Name="ManBrow" Click="ManBrow_Click">Manage Browsing Histories</MenuFlyoutItem>
                         </MenuFlyout>
                     </Button.Flyout>
 
@@ -227,6 +229,13 @@
                                 <FontIcon Glyph="&#xE896;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+                        <ToggleMenuFlyoutItem x:Name="FavBarMenuItem"
+                                        Text="Favorite Bar" 
+                                        Click="FavBarMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE76F;" />
+                            </MenuFlyoutItem.Icon>
+                        </ToggleMenuFlyoutItem>
                         <MenuFlyoutSeparator></MenuFlyoutSeparator>
                         <MenuFlyoutItem x:Name="DevToolsMenuItem"
                                         Text="Developer Tools"
@@ -256,10 +265,43 @@
                           FontSize="15" />
 
             </Button>
+            <Button x:Name="chat" Grid.Column="3" Margin="50,10,0,0" Click="chat_Click">
+                <FontIcon Glyph="&#xE8F2;"
+                          FontSize="15" />
+            </Button>
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="4">
+                
+                <ListView x:Name="FavBar"  IsItemClickEnabled="True" ItemClick="FavBar_ItemClick" ItemsSource="{x:Bind local:Common.bookmarkEdit}"  ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Vertical" MaximumRowsOrColumns="1"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:Name="DoubleLineDataTemplate" x:DataType="bk:BookmarkLink">
+                            <SwipeControl>
+                                <StackPanel Orientation="Horizontal" Height="25" AutomationProperties.Name="{x:Bind Title}">
+                                    <Ellipse Height="20" Width="20" VerticalAlignment="Center">
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="{x:Bind IconUrl}"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <StackPanel Width="Auto" Orientation="Vertical" VerticalAlignment="Center" Margin="12,0,0,0">
+                                        <TextBlock Width="70" FontSize="10" Text="{x:Bind Title}"  Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" />
+                                        <!--<ToolTip Content="{x:Bind Url}"/>-->
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </SwipeControl>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                
+            </StackPanel>
 
             <winui:TabView x:Name="Tabs"
                            Grid.ColumnSpan="4"
-                           Grid.Row="1"
+                           Grid.Row="2"
                            Margin="0,-3,0,0"
                            HorizontalAlignment="Stretch"
                            VerticalAlignment="Stretch"

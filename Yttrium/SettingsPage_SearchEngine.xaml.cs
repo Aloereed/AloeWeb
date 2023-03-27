@@ -54,6 +54,31 @@ namespace AloeWeb_browser
             try
             {
                 localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                string nt = (string)localSettings.Values["search"];
+                if (nt.Contains("bing"))
+                {
+                    Bing.IsChecked = true;
+                }
+                else if (nt.Contains("google"))
+                {
+                    Google.IsChecked = true;
+                }
+                else if (nt.Contains("baidu"))
+                {
+                    Baidu.IsChecked = true;
+                }
+                else if (nt.Contains("yandex"))
+                {
+                    Yandex.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            try
+            {
+                localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
                 string nt = (string)localSettings.Values["homepage"];
                 if (nt is null || nt == "") 
                     HomeasTab.IsChecked = true;
@@ -107,6 +132,26 @@ namespace AloeWeb_browser
         {
             if(CustomHome.IsChecked??false)
                 localSettings.Values["homepage"] = CustomHomePage.Text;
+        }
+
+        private void Bing_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["search"] = "https://www.bing.com/search?q=";
+        }
+
+        private void Google_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["search"] = "https://www.google.com/search?q=";
+        }
+
+        private void Baidu_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["search"] = "https://www.baidu.com/s?&wd=";
+        }
+
+        private void Yandex_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["search"] = "https://yandex.com/search/?text=";
         }
     }
 }
