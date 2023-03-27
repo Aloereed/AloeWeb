@@ -4,7 +4,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
-      xmlns:winui="using:Microsoft.UI.Xaml.Controls" xmlns:bk="using:BookmarksManager" xmlns:local="using:AloeWeb_browser"
+      xmlns:winui="using:Microsoft.UI.Xaml.Controls" xmlns:bk="using:BookmarksManager" xmlns:local="using:AloeWeb_browser" xmlns:chat="using:OpenAI_API.Chat"
       winui:BackdropMaterial.ApplyToRootOrPageBackground="True"
       x:Name="MainWindow">
     <Page.Resources>
@@ -236,6 +236,19 @@
                                 <FontIcon Glyph="&#xE76F;" />
                             </MenuFlyoutItem.Icon>
                         </ToggleMenuFlyoutItem>
+                        <MenuFlyoutItem x:Name="CaptureMenuItem"
+                                        Text="Capture"
+                                        Click="CaptureMenuItem_Click"
+                                        AccessKey="S">
+                            <MenuFlyoutItem.KeyboardAccelerators>
+                                <KeyboardAccelerator 
+                                    Modifiers="Control,Shift" 
+                                    Key="S" />
+                            </MenuFlyoutItem.KeyboardAccelerators>
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE722;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutSeparator></MenuFlyoutSeparator>
                         <MenuFlyoutItem x:Name="DevToolsMenuItem"
                                         Text="Developer Tools"
@@ -265,7 +278,7 @@
                           FontSize="15" />
 
             </Button>
-            <Button x:Name="chat" Grid.Column="3" Margin="50,10,0,0" Click="chat_Click">
+            <Button x:Name="chat" Visibility="Collapsed" Grid.Column="3" Margin="50,10,0,0" Click="chat_Click">
                 <FontIcon Glyph="&#xE8F2;"
                           FontSize="15" />
             </Button>
@@ -278,7 +291,7 @@
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
                     <ListView.ItemTemplate>
-                        <DataTemplate x:Name="DoubleLineDataTemplate" x:DataType="bk:BookmarkLink">
+                        <DataTemplate x:Name="DoubleLineDataTemplate2" x:DataType="bk:BookmarkLink">
                             <SwipeControl>
                                 <StackPanel Orientation="Horizontal" Height="25" AutomationProperties.Name="{x:Bind Title}">
                                     <Ellipse Height="20" Width="20" VerticalAlignment="Center">
@@ -300,7 +313,7 @@
             </StackPanel>
 
             <winui:TabView x:Name="Tabs"
-                           Grid.ColumnSpan="4"
+                           Grid.ColumnSpan="3"
                            Grid.Row="2"
                            Margin="0,-3,0,0"
                            HorizontalAlignment="Stretch"
@@ -333,6 +346,23 @@
                     </Frame>
                 </winui:TabViewItem>
             </winui:TabView>
+            <Grid Grid.Row="2" Grid.Column="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="8*"></RowDefinition>
+                    <RowDefinition Height="2*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <ListView x:Name="ChatList" Grid.Row="0">
+                    <ListViewItem>AI: Hi, I'm your assistant in AloeWeb, how can I help you?</ListViewItem>
+                </ListView>
+                <Grid x:Name="UserBox" Grid.Row="1" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="userinput" HorizontalAlignment="Stretch"></TextBox>
+                    <Button Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="{x:Bind UserBox.Width}" Click="Button_Click">Send</Button>
+                </Grid>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

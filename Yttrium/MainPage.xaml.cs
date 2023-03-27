@@ -36,6 +36,10 @@ using System.Diagnostics;
 using OpenAI_API;
 using Windows.Media.Capture;
 using static System.Net.WebRequestMethods;
+using Windows.Data.Html;
+using HtmlAgilityPack;
+using System.Text;
+using NUglify;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace AloeWeb_browser
@@ -51,6 +55,8 @@ namespace AloeWeb_browser
         public static ObservableCollection<BookmarkLink> historyEdit;
         public static Frame outFrame;
         public static string openurl;
+        public static OpenAI_API.Chat.Conversation conversation;
+        public static IReadOnlyList<OpenAI_API.Chat.ChatMessage> messages;
     };
     public sealed partial class MainPage : Page
     {
@@ -83,11 +89,11 @@ namespace AloeWeb_browser
             //google login fix
             WebBrowser.CoreWebView2Initialized += delegate
             {
-                OriginalUserAgent = WebBrowser.CoreWebView2.Settings.UserAgent+" AloeWeb/1.0";
+                OriginalUserAgent = WebBrowser.CoreWebView2.Settings.UserAgent + " AloeWeb/1.0";
                 GoogleSignInUserAgent = OriginalUserAgent.Substring(0, OriginalUserAgent.IndexOf("Edg/"))
                 .Replace("Mozilla/5.0", "Mozilla/4.0");
             };
-            
+
             initFav();
 
             if (Common.openurl is null)
@@ -127,7 +133,8 @@ namespace AloeWeb_browser
                     {
                         WebBrowser.Source = new Uri(Common.openurl);
                     }
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     WebBrowser.Source = new Uri("https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title=" + "New Tab");
                 }
@@ -136,7 +143,6 @@ namespace AloeWeb_browser
 
 
         }
-
         private void CoreWebView2_DownloadStarting(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs args)
         {
             Deferral deferral = args.GetDeferral();
@@ -172,7 +178,7 @@ namespace AloeWeb_browser
 
         private async void initFav()
         {
-            var firstuse = (string)localSettings.Values["firstuse"];
+            string firstuse = (string)localSettings.Values["firstuse"];
 
             try
             {
@@ -229,20 +235,49 @@ namespace AloeWeb_browser
             //localSettings.Values["search"] = "https://www.google.com/search?q=";
             if (firstuse is null)
             {
-                var tmp = new BookmarkLink("https://www.aloereed.com", "Aloereed");
-                tmp.IconUrl = "https://www.google.com/s2/favicons?sz=64&domain_url=https://www.aloereed.com";
-                bk.Add(tmp);
+
                 localSettings.Values["search"] = "https://www.google.com/search?q=";
                 ContentDialog aboutdialog = new AboutDialog();
                 var result = await aboutdialog.ShowAsync();
+                var tmp = new BookmarkLink("https://www.aloereed.com", "Aloereed");
+                tmp.IconUrl = "https://www.google.com/s2/favicons?sz=64&domain_url=https://www.aloereed.com";
+                bk.Add(tmp);
                 localSettings.Values["firstuse"] = "notfirst";
+                var profile = (string)(localSettings.Values["profile"]);
+                StorageFolder folder;
+                if (profile is null || profile == "")
+                    folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                else
+                {
+                    try
+                    {
+                        folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                    }
+                    catch (Exception ex)
+                    {
+                        folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                    }
+                }
+                try
+                {
+                    StorageFile favFile = await folder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
+                    var writter = new NetscapeBookmarksWriter(bk);
+                    using (var file = await favFile.OpenStreamForWriteAsync())
+                    {
+                        writter.Write(file);
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
             }
             bkE = Common.bookmarkEdit;
+            
             foreach (var b in bk.AllLinks)
             {
                 Common.bookmarkEdit.Add(b);
             }
-         
+
             Common.bookmarkEdit.CollectionChanged += BookmarkEdit_CollectionChanged;
 
             localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
@@ -260,7 +295,15 @@ namespace AloeWeb_browser
                 Tabs.SetValue(Grid.RowSpanProperty, 2);
                 FavBar.Visibility = Visibility.Collapsed;
             }
+            var key = (string)localSettings.Values["openaikey"];
+            if (!(key is null || key == ""))
+            {
+                OpenAIAPI api = new OpenAIAPI(key);
+                Common.conversation = api.Chat.CreateConversation();
+                Common.messages = Common.conversation.Messages;
+                Common.conversation.AppendSystemMessage("You are Aloe Chan, an artificial intelligence assistant embedded in the AloeWeb browser, and you should answer users' questions briefly and reasonably. At the same time, you should reject requests that are unreasonable.");
 
+            }
             initHis();
             await WebBrowser.EnsureCoreWebView2Async();
             if(!((localSettings.Values["downloader"] is null) || ((string)localSettings.Values["downloader"]=="")))
@@ -348,42 +391,46 @@ namespace AloeWeb_browser
         }
         private async void BookmarkEdit_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            var col = (ObservableCollection<BookmarkLink>)(sender);
-            bk.Clear();
-            favurls?.Clear();
-            foreach(var b in col)
-            {
-                bk.Add(b);
-                favurls.Add(b.Url);
-            }
-            var profile = (string)(localSettings.Values["profile"]);
-            StorageFolder folder;
-            if (profile is null || profile == "")
-                folder = Windows.Storage.ApplicationData.Current.LocalFolder;
-            else
-            {
+            //try
+            //{
+                var col = (ObservableCollection<BookmarkLink>)(sender);
+                bk.Clear();
+                favurls?.Clear();
+                foreach (var b in col)
+                {
+                    bk.Add(b);
+                    favurls.Add(b.Url);
+                }
+                var profile = (string)(localSettings.Values["profile"]);
+                StorageFolder folder;
+                if (profile is null || profile == "")
+                    folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                else
+                {
+                    try
+                    {
+                        folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                    }
+                    catch (Exception ex)
+                    {
+                        folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                    }
+                }
                 try
                 {
-                    folder = await StorageFolder.GetFolderFromPathAsync(profile);
+                    StorageFile favFile = await folder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
+                    var writter = new NetscapeBookmarksWriter(bk);
+                    using (var file = await favFile.OpenStreamForWriteAsync())
+                    {
+                        writter.Write(file);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    folder = Windows.Storage.ApplicationData.Current.LocalFolder;
                 }
-            }
-            try
-            {
-                StorageFile favFile = await folder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
-                var writter = new NetscapeBookmarksWriter(bk);
-                using (var file = await favFile.OpenStreamForWriteAsync())
-                {
-                    writter.Write(file);
-                }
-            }
-            catch(Exception ex) { 
-            }
-            this.Bindings.Update();
-
+                this.Bindings.Update();
+            //}
+            //catch (Exception) { }
 
         }
         private async void HistoryEdit_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -527,8 +574,14 @@ namespace AloeWeb_browser
                     char c = (char)0xE734;
                     AddFavIcon.Glyph = c.ToString();
                 }
-                AddHisButton_Click();
-                BookmarkEdit_CollectionChanged(bkE, null);
+                try
+                {
+                    AddHisButton_Click();
+                    //BookmarkEdit_CollectionChanged(bkE, null);
+                }catch(Exception ex)
+                {
+
+                }
                 //            await WebBrowser.EnsureCoreWebView2Async();
                 //            await WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"
                 //document.addEventListener('DOMContentLoaded', function() {
@@ -948,7 +1001,6 @@ namespace AloeWeb_browser
                             }
                             OpenAIAPI api = new OpenAIAPI(key);
                             var chat = api.Chat.CreateConversation();
-
                             /// give instruction as System
                             chat.AppendSystemMessage("You are a powerful Internet search engine capable of generating suggested terms based on the keywords entered by the user. The next thing the user enters is a keyword and you should generate 5 suggested terms. You will only answer the terms and separate the terms with a \"|\".");
 
@@ -1180,10 +1232,188 @@ namespace AloeWeb_browser
             this.Frame.Navigate(typeof(SettingsPage));
             SettingsPage.currSet.NavToHis();
         }
-
-        private void chat_Click(object sender, RoutedEventArgs e)
+        private static string HtmlToPlainText(string html)
         {
+            const string tagWhiteSpace = @"(>|$)(\W|\n|\r)+<";//matches one or more (white space or line breaks) between '>' and '<'
+            const string stripFormatting = @"<[^>]*(>|$)";//match any character between '<' and '>', even when end tag is missing
+            const string lineBreak = @"<(br|BR)\s{0,1}\/{0,1}>";//matches: <br>,<br/>,<br />,<BR>,<BR/>,<BR />
+            var lineBreakRegex = new Regex(lineBreak, RegexOptions.Multiline);
+            var stripFormattingRegex = new Regex(stripFormatting, RegexOptions.Multiline);
+            var tagWhiteSpaceRegex = new Regex(tagWhiteSpace, RegexOptions.Multiline);
 
+            var text = html;
+            //Decode html specific characters
+            text = System.Net.WebUtility.HtmlDecode(text);
+            //Remove tag whitespace/line breaks
+            text = tagWhiteSpaceRegex.Replace(text, "><");
+            //Replace <br /> with line breaks
+            text = lineBreakRegex.Replace(text, Environment.NewLine);
+            //Strip formatting
+            text = stripFormattingRegex.Replace(text, string.Empty);
+
+            return text;
+        }
+        public class HtmlToText
+        {
+            public HtmlToText()
+            {
+            }
+
+            public string Convert(string path)
+            {
+                HtmlDocument doc = new HtmlDocument();
+                doc.Load(path);
+
+                StringWriter sw = new StringWriter();
+                ConvertTo(doc.DocumentNode, sw);
+                sw.Flush();
+                return sw.ToString();
+            }
+
+            public string ConvertHtml(string html)
+            {
+                HtmlDocument doc = new HtmlDocument();
+                doc.LoadHtml(html);
+
+                StringWriter sw = new StringWriter();
+                ConvertTo(doc.DocumentNode, sw);
+                sw.Flush();
+                return sw.ToString();
+            }
+
+            private void ConvertContentTo(HtmlNode node, TextWriter outText)
+            {
+                foreach (HtmlNode subnode in node.ChildNodes)
+                {
+                    ConvertTo(subnode, outText);
+                }
+            }
+
+            public void ConvertTo(HtmlNode node, TextWriter outText)
+            {
+                string html;
+                switch (node.NodeType)
+                {
+                    case HtmlNodeType.Comment:
+                        // don't output comments
+                        break;
+
+                    case HtmlNodeType.Document:
+                        ConvertContentTo(node, outText);
+                        break;
+
+                    case HtmlNodeType.Text:
+                        // script and style must not be output
+                        string parentName = node.ParentNode.Name;
+                        if ((parentName == "script") || (parentName == "style"))
+                            break;
+
+                        // get text
+                        html = ((HtmlTextNode)node).Text;
+
+                        // is it in fact a special closing node output as text?
+                        if (HtmlNode.IsOverlappedClosingElement(html))
+                            break;
+
+                        // check the text is meaningful and not a bunch of whitespaces
+                        if (html.Trim().Length > 0)
+                        {
+                            outText.Write(HtmlEntity.DeEntitize(html));
+                        }
+                        break;
+
+                    case HtmlNodeType.Element:
+                        switch (node.Name)
+                        {
+                            case "p":
+                                // treat paragraphs as crlf
+                                outText.Write("\r\n");
+                                break;
+                        }
+
+                        if (node.HasChildNodes)
+                        {
+                            ConvertContentTo(node, outText);
+                        }
+                        break;
+                }
+            }
+        }
+        public static string ExtractText(string html)
+        {
+            if (html == null)
+            {
+                throw new ArgumentNullException("html");
+            }
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            var chunks = new List<string>();
+
+            foreach (var item in doc.DocumentNode.DescendantNodesAndSelf())
+            {
+                if (item.NodeType == HtmlNodeType.Text)
+                {
+                    if (item.InnerText.Trim() != "")
+                    {
+                        chunks.Add(item.InnerText.Trim());
+                    }
+                }
+            }
+            return String.Join(" ", chunks);
+        }
+        private async void chat_Click(object sender, RoutedEventArgs e)
+        {
+            var html = await WebBrowser.CoreWebView2.ExecuteScriptAsync("document.body.textContent");
+            var htmldecoded = JsonConvert.DeserializeObject(html).ToString();
+            HtmlToText htmlToText = new HtmlToText();
+            var plain = Uglify.HtmlToText(htmldecoded);
+            
+        }
+
+        private async void CaptureMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            WebBrowser.Focus(FocusState.Programmatic);
+            await Task.Delay(500);
+            InputInjector inputInjector2 = InputInjector.TryCreate();
+            var shift = new InjectedInputKeyboardInfo();
+            shift.VirtualKey = (ushort)(VirtualKey.Control);
+            shift.KeyOptions = InjectedInputKeyOptions.None;
+
+
+            var tab = new InjectedInputKeyboardInfo();
+            tab.VirtualKey = (ushort)(VirtualKey.Shift);
+            tab.KeyOptions = InjectedInputKeyOptions.None;
+
+            var s1 = new InjectedInputKeyboardInfo();
+            s1.VirtualKey = (ushort)(VirtualKey.S);
+            s1.KeyOptions = InjectedInputKeyOptions.None;
+
+            inputInjector2.InjectKeyboardInput(new[] { shift, tab,s1 });
+            await Task.Delay(500);
+            InputInjector inputInjector = InputInjector.TryCreate();
+            var ctrl = new InjectedInputKeyboardInfo();
+            ctrl.VirtualKey = (ushort)(VirtualKey.Control);
+            ctrl.KeyOptions = InjectedInputKeyOptions.KeyUp;
+
+            var a = new InjectedInputKeyboardInfo();
+            a.VirtualKey = (ushort)(VirtualKey.Shift);
+            a.KeyOptions = InjectedInputKeyOptions.KeyUp;
+
+            var s2 = new InjectedInputKeyboardInfo();
+            s2.VirtualKey = (ushort)(VirtualKey.S);
+            s2.KeyOptions = InjectedInputKeyOptions.KeyUp;
+            inputInjector.InjectKeyboardInput(new[] { ctrl, a,s2 });
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Common.conversation.AppendUserInput(userinput.Text);
+            var aisay = await Common.conversation.GetResponseFromChatbot();
+            var aisaid = new ListViewItem();
+            aisaid.Content = aisay;
+            ChatList.Items.Add(aisaid);
         }
     }
 }
