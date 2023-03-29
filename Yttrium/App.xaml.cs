@@ -8,6 +8,9 @@ using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Globalization;
+using Windows.Storage;
+using Windows.System.UserProfile;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -29,11 +32,70 @@ namespace AloeWeb_browser
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
+        public static string GetCurLanguage()
+        {
+            var languages = GlobalizationPreferences.Languages;
+            if (languages.Count > 0)
+            {
+                List<string> lLang = new List<string>();
+                lLang.Add("zh-cn、zh、zh-Hans、zh-hans-cn、zh-sg、zh-hans-sg");
+                lLang.Add("zh-tw、zh-Hant、zh-mo、zh-hk、zh-hant-hk、zh-hant-mo、zh-hant-tw");
+                lLang.Add("de-de、de-at、de-ch、de-lu、de-li");
+                lLang.Add("en-us、en、en-au、en-ca、en-gb、en-ie、en-in、en-nz、en-sg、en-za、en-bz、en-hk、en-id、en-jm、en-kz、en-mt、en-my、en-ph、en-pk、en-tt、en-vn、en-zw、en-053、en-021、en-029、en-011、en-018、en-014");
+                lLang.Add("fr-fr、fr-be、fr-ca、fr-ch、fr、fr-lu、fr-015、fr-cd、fr-ci、fr-cm、fr-ht、fr-ma、fr-mc、fr-ml、fr-re、frc-latn、frp-latn、fr-155、fr-029、fr-021、fr-011");
+                lLang.Add("ja-jp、ja");
+                lLang.Add("ko-kr、ko");
+                lLang.Add("ru-ru、ru");
+                for (int i = 0; i < lLang.Count; i++)
+                {
+                    if (lLang[i].ToLower().Contains(languages[0].ToLower()))
+                    {
+                        string temp = lLang[i].ToLower();
+                        string[] tempArr = temp.Split('、');
+
+                        return tempArr[0];
+                    }
+                    else
+                        return "en-us";
+                }
+            }
+            return "en-us";
+        }
         public App()
         {
+            string strCurrentLanguage;
+            if (ApplicationData.Current.LocalSettings.Values["CurrentLanguage"] != null)
+            {
+                strCurrentLanguage = ApplicationData.Current.LocalSettings.Values["CurrentLanguage"].ToString();
+                if (strCurrentLanguage == "Auto" || strCurrentLanguage == "Choose")
+                {
+                    ApplicationLanguages.PrimaryLanguageOverride = GetCurLanguage();
+                }
+                else
+                    ApplicationLanguages.PrimaryLanguageOverride = strCurrentLanguage;
+            }
+            else
+            {
+                ApplicationLanguages.PrimaryLanguageOverride = strCurrentLanguage = GetCurLanguage();
+                //ApplicationLanguages.PrimaryLanguageOverride = strCurrentLanguage = "en-us";
+            }
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            UnhandledException += App_UnhandledException;
+        }
 
+        private async void App_UnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+            //TODO: 保存用户数据
+            await new Windows.UI.Xaml.Controls.ContentDialog
+            {
+                Title = "Oops, the following accident seems to have happened to your program, please contact the developer.",
+                Content = " If the problem is caused by WebView2, you may need to fix the WebView2 Runtime on your computer first. If your computer is configured with a proxy, then you need to set up the UWP proxy loopback or turn off the proxy first. \n"+ e.Exception+":"+e.Message,
+                CloseButtonText = "Close",
+                DefaultButton = Windows.UI.Xaml.Controls.ContentDialogButton.Close
+            }.ShowAsync();
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:appsfeatures"));
         }
 
         /// <summary>

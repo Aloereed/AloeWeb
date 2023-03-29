@@ -21,8 +21,9 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal" Margin="16,10,10,0">
-                <Button Margin="5,0,0,0" x:Name="RemoveAllHis" Click="RemoveAllHis_Click">Remove all histories</Button>
-                <Button Margin="5,0,0,0" x:Name="RemoveAllCookies" Click="RemoveAllCookies_Click">Remove all cookies</Button>
+                <Button Margin="5,0,0,0" x:Uid="RemoveAllHis" x:Name="RemoveAllHis" Click="RemoveAllHis_Click" >Remove all histories</Button>
+                <Button Margin="5,0,0,0" x:Uid="RemoveAllCookies" x:Name="RemoveAllCookies" Click="RemoveAllCookies_Click">Remove all cookies</Button>
+                <Button Margin="5,0,0,0" x:Uid="RemoveAllOther" x:Name="RemoveAllOther" Click="RemoveAllOther_Click">Remove other saved data</Button>
             </StackPanel>
             
             <!-- Card -->
@@ -35,6 +36,7 @@
 
                 <!-- Expander in which is history -->
                 <winui:Expander Header="Full history"
+                                x:Uid="ExpanderHis"
                                 Margin="10,10,10,10"
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Stretch"

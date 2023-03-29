@@ -40,6 +40,9 @@ using Windows.Data.Html;
 using HtmlAgilityPack;
 using System.Text;
 using NUglify;
+using AloeWeb.Helpers;
+using Microsoft.Web.WebView2.Core;
+using System.ComponentModel;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace AloeWeb_browser
@@ -57,6 +60,7 @@ namespace AloeWeb_browser
         public static string openurl;
         public static OpenAI_API.Chat.Conversation conversation;
         public static IReadOnlyList<OpenAI_API.Chat.ChatMessage> messages;
+        public static ListView ChatList;
     };
     public sealed partial class MainPage : Page
     {
@@ -75,17 +79,36 @@ namespace AloeWeb_browser
         HashSet<string> hisurls;
         ApplicationDataContainer localSettings;
         List<WebView2> webView2s=new List<WebView2>();
+        HashSet<string> adsdomain;
+        public async Task<HashSet<string>> ReadAdsDomain()
+        {
+            var ads = new HashSet<string>();
+            var storageFile1 = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///BlockAds/ads-nl.txt"));
+            string text = await Windows.Storage.FileIO.ReadTextAsync(storageFile1);
+            foreach(var dm in text.Split('\n'))
+            {
+                if(dm.Length>4)
+                    ads.Add(dm);
+            }
+            var storageFile2 = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///BlockAds/abuse-nl.txt"));
+            string text2 = await Windows.Storage.FileIO.ReadTextAsync(storageFile2);
+            foreach (var dm in text2.Split('\n'))
+            {
+                if (dm.Length > 4)
+                    ads.Add(dm);
+            }
+            return ads;
+        }
         public MainPage()
         {
             this.InitializeComponent();
             localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
             //creates settings file on app first launch
-            SettingsData settings = new SettingsData();
-            settings.CreateSettingsFile();
             WebBrowser = FirstWebBrowser;
             webView2s.Add(WebBrowser);
             TabContent = FirstTabContent;
             CurrTab = FirstTab;
+            adsdomain = new HashSet<string>(); 
             //google login fix
             WebBrowser.CoreWebView2Initialized += delegate
             {
@@ -93,8 +116,8 @@ namespace AloeWeb_browser
                 GoogleSignInUserAgent = OriginalUserAgent.Substring(0, OriginalUserAgent.IndexOf("Edg/"))
                 .Replace("Mozilla/5.0", "Mozilla/4.0");
             };
-
-            initFav();
+            Common.ChatList = ChatList;
+            
 
             if (Common.openurl is null)
             {
@@ -141,15 +164,17 @@ namespace AloeWeb_browser
                 Common.openurl = null;
             }
 
+            initFav();
 
         }
-        private void CoreWebView2_DownloadStarting(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs args)
+        private async void CoreWebView2_DownloadStarting(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs args)
         {
             Deferral deferral = args.GetDeferral();
 
             // We avoid potential reentrancy from running a message loop in the download
             // starting event handler by showing our download dialog later when we
             // complete the deferral asynchronously.
+
             System.Threading.SynchronizationContext.Current.Post(async(_) =>
             {
                 using (deferral)
@@ -178,6 +203,7 @@ namespace AloeWeb_browser
 
         private async void initFav()
         {
+            await Task.Delay(100);
             string firstuse = (string)localSettings.Values["firstuse"];
 
             try
@@ -214,17 +240,26 @@ namespace AloeWeb_browser
             catch (Exception)
             {
                 AloeWeb_browser.Common.bookmarks = new BookmarkFolder();
-                StorageFile favFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
-                var writter = new NetscapeBookmarksWriter(AloeWeb_browser.Common.bookmarks);
-                using (var file = await favFile.OpenStreamForWriteAsync())
+                try
                 {
-                    writter.Write(file);
+                    StorageFile favFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("fav.list", CreationCollisionOption.ReplaceExisting);
+                    var writter = new NetscapeBookmarksWriter(AloeWeb_browser.Common.bookmarks);
+                    using (var file = await favFile.OpenStreamForWriteAsync())
+                    {
+                        writter.Write(file);
+                    }
                 }
-                Console.WriteLine(favFile.Path);
+
+                catch(Exception)
+                {
+
+                }
             }
             bk = AloeWeb_browser.Common.bookmarks;
             favurls = new HashSet<string>();
             await WebBrowser.EnsureCoreWebView2Async();
+            bool usepwd = (bool?)localSettings.Values["usepwd"] ?? false;
+            WebBrowser.CoreWebView2.Settings.IsPasswordAutosaveEnabled = usepwd;
             WebBrowser.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
             
             foreach (var b in bk.AllLinks)
@@ -242,7 +277,6 @@ namespace AloeWeb_browser
                 var tmp = new BookmarkLink("https://www.aloereed.com", "Aloereed");
                 tmp.IconUrl = "https://www.google.com/s2/favicons?sz=64&domain_url=https://www.aloereed.com";
                 bk.Add(tmp);
-                localSettings.Values["firstuse"] = "notfirst";
                 var profile = (string)(localSettings.Values["profile"]);
                 StorageFolder folder;
                 if (profile is null || profile == "")
@@ -270,9 +304,13 @@ namespace AloeWeb_browser
                 catch (Exception ex)
                 {
                 }
+                await Task.Delay(100);
+                localSettings.Values["firstuse"] = "notfirst";
             }
+
+
             bkE = Common.bookmarkEdit;
-            
+            //throw new FileNotFoundException();
             foreach (var b in bk.AllLinks)
             {
                 Common.bookmarkEdit.Add(b);
@@ -302,13 +340,54 @@ namespace AloeWeb_browser
                 Common.conversation = api.Chat.CreateConversation();
                 Common.messages = Common.conversation.Messages;
                 Common.conversation.AppendSystemMessage("You are Aloe Chan, an artificial intelligence assistant embedded in the AloeWeb browser, and you should answer users' questions briefly and reasonably. At the same time, you should reject requests that are unreasonable.");
-
+                var aisay = "AIHello".GetLocalized();
+                var aisaid = new SimpleMessage();
+                aisaid.content = aisay;
+                aisaid.role = "AI";
+                aisaid.iconsource = "https://cdn-icons-png.flaticon.com/512/4711/4711987.png";
+                ChatList.Items.Add(aisaid);
+            }
+            else
+            {
+                chat.Visibility = Visibility.Collapsed;
             }
             initHis();
+            adsdomain = await ReadAdsDomain();
             await WebBrowser.EnsureCoreWebView2Async();
             if(!((localSettings.Values["downloader"] is null) || ((string)localSettings.Values["downloader"]=="")))
                 WebBrowser.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
+            if (!((localSettings.Values["blockads"] is null) || ((string)localSettings.Values["blockads"] == "")))
+                WebBrowser.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
+            
+            //var defdown = (string)localSettings.Values["downdir"];
+            //if (!(defdown is null || defdown == ""))
+            //    WebBrowser.CoreWebView2.Profile.DefaultDownloadFolderPath = defdown;
+            //else
+            //{
+
+            //    WebBrowser.CoreWebView2.Profile.DefaultDownloadFolderPath = "C:\\Users\\huzheng";// (await KnownFolders.DocumentsLibrary.GetParentAsync()).Path + "\\Downloads";
+            //}
         }
+        public bool ContainsAny(string input, IEnumerable<string> containsKeywords, StringComparison comparisonType)
+        {
+            Uri u = new Uri(input);
+            foreach(var ad in containsKeywords)
+            {
+                if(u.Host.Contains(ad))
+                {
+                    return true;
+                }
+            }
+            return containsKeywords.Any(keyword => input.IndexOf(keyword, comparisonType) >= 0);
+
+        }
+        private void CoreWebView2_NavigationStarting(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
+        {
+            Uri u = new Uri(args.Uri);
+            if(adsdomain.Contains(u.Host))
+                args.Cancel = true;
+        }
+
         private async void initHis()
         {
             try
@@ -508,8 +587,17 @@ namespace AloeWeb_browser
             try
             {
                 sender.CoreWebView2.Settings.IsStatusBarEnabled = false;
-                Uri icoURI = new Uri("https://www.google.com/s2/favicons?sz=64&domain_url=" + sender.Source);
-                if(!(sender.Parent is null))
+                Uri icoURI;
+                var favi = (string)localSettings.Values["favi"];
+                if (favi is null || favi == "google")
+                {
+                    icoURI = new Uri("https://www.google.com/s2/favicons?sz=64&domain_url=" + WebBrowser.Source);
+                }
+                else
+                {
+                    icoURI = new Uri("http://spatial-magenta-stork.faviconkit.com/" + geturlwohttp(WebBrowser.Source.AbsoluteUri) + "/64");
+                }
+                if (!(sender.Parent is null))
                 {
                     ((TabViewItem)(((Frame)(sender.Parent)).Parent)).IconSource = new Microsoft.UI.Xaml.Controls.BitmapIconSource() { UriSource = icoURI, ShowAsMonochrome = false };
                     ((TabViewItem)(((Frame)(sender.Parent)).Parent)).Header = sender.CoreWebView2.DocumentTitle.ToString();
@@ -544,7 +632,7 @@ namespace AloeWeb_browser
 
                 ToolTip tooltip = new ToolTip
                 {
-                    Content = "This website has a SSL certificate"
+                    Content = "HaveSSL".GetLocalized()
                 };
                 sender.CoreWebView2.ServerCertificateErrorDetected += CoreWebView2_ServerCertificateErrorDetected;
                 ToolTipService.SetToolTip(SSLButton, tooltip);
@@ -557,7 +645,7 @@ namespace AloeWeb_browser
                 SSLIcon.Glyph = "\xE7BA";
                 ToolTip tooltip = new ToolTip
                 {
-                    Content = "This website is unsafe and doesn't have a SSL certificate"
+                    Content = "NoSSL".GetLocalized()
                 };
                 ToolTipService.SetToolTip(SSLButton, tooltip);
 
@@ -601,7 +689,7 @@ namespace AloeWeb_browser
 
         private void CoreWebView2_ServerCertificateErrorDetected(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2ServerCertificateErrorDetectedEventArgs args)
         {
-            ToolTipService.SetToolTip(SSLButton, "This website has a SSL certificate, however, some errors are detected.");
+            ToolTipService.SetToolTip(SSLButton, "SSLError".GetLocalized());
         }
 
         //if enter is pressed, it searches text in SearchBar or goes to web page
@@ -756,10 +844,14 @@ namespace AloeWeb_browser
             var downloader = Windows.Storage.ApplicationData.Current.LocalSettings.Values["downloader"];
             if (!((downloader is null) || ((string)downloader == "")))
                 webView.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
+            if (!((ApplicationData.Current.LocalSettings.Values["blockads"] is null) || ((string)ApplicationData.Current.LocalSettings.Values["blockads"] == "")))
+                webView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
             webView2s.Add(webView);
             webView.NavigationStarting += WebBrowser_NavigationStarting;
             webView.NavigationCompleted += WebBrowser_NavigationCompleted;
             webView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
+            bool usepwd = (bool?)ApplicationData.Current.LocalSettings.Values["usepwd"] ?? false;
+            WebBrowser.CoreWebView2.Settings.IsPasswordAutosaveEnabled = usepwd;
             Frame frame = new Frame();
             frame.Content = webView;
             //webView.CoreWebView2.Navigate("https://google.com");
@@ -785,6 +877,18 @@ namespace AloeWeb_browser
             }
             sender.SelectedItem = Tabs.TabItems.Last();
         }
+        public string geturlwohttp(string url)
+        {
+            if (url.Contains("https://"))
+            {
+                return url.Substring(8);
+            }
+            else if (url.Contains("http://"))
+            {
+                return url.Substring(7);
+            }
+            return url;
+        }
         private async Task<WebView2> ResumeWebpage(TabView sender, string uri, bool ifwait = true)
         {
             WebView2 webView = new WebView2();
@@ -792,9 +896,13 @@ namespace AloeWeb_browser
             var downloader = Windows.Storage.ApplicationData.Current.LocalSettings.Values["downloader"];
             if (!((downloader is null) || ((string)downloader == "")))
                 webView.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
+            if (!((ApplicationData.Current.LocalSettings.Values["blockads"] is null) || ((string)ApplicationData.Current.LocalSettings.Values["blockads"] == "")))
+                webView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
             webView.NavigationStarting += WebBrowser_NavigationStarting;
             webView.NavigationCompleted += WebBrowser_NavigationCompleted;
             webView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
+            bool usepwd = (bool?)ApplicationData.Current.LocalSettings.Values["usepwd"] ?? false;
+            WebBrowser.CoreWebView2.Settings.IsPasswordAutosaveEnabled = usepwd;
             Frame frame = new Frame();
             frame.Content = webView;
             webView.Source = new Uri(uri);
@@ -803,8 +911,19 @@ namespace AloeWeb_browser
             //sender.TabItems.Add(new TabViewItem() { Content = newTab });
             //sender.SelectedItem = newTab ;
             //SearchBar.Text = newTab.Header.ToString();
-            Uri icoURI = new Uri("https://www.google.com/s2/favicons?sz=64&domain_url=" + webView.Source);
-            if(ifwait)
+            Uri icoURI;
+            var favi = (string)localSettings.Values["favi"];
+            if(favi is null || favi == "google") { 
+                icoURI = new Uri("https://www.google.com/s2/favicons?sz=64&domain_url=" + webView.Source);
+            }
+            else
+            {
+                icoURI = new Uri("http://spatial-magenta-stork.faviconkit.com/" + geturlwohttp(webView.Source.AbsoluteUri) + "/64");
+            }
+            
+            
+
+            if (ifwait)
                 await Task.Delay(1000);
             TabViewItem tvi = new TabViewItem()
             {
@@ -854,7 +973,7 @@ namespace AloeWeb_browser
         }
 
 
-        private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TabContent.Content is HomePage)
             {
@@ -871,6 +990,15 @@ namespace AloeWeb_browser
                 WebBrowser = (WebView2)(TabContent.Content);
                 
                 SearchBar.Text = WebBrowser.Source.AbsoluteUri;
+                try
+                {
+                    await WebBrowser.EnsureCoreWebView2Async();
+                    MuteMenuItem.IsChecked =  WebBrowser.CoreWebView2.IsMuted;
+                }catch(Exception ex) { }
+                
+
+
+
             }
         }
 
@@ -1019,7 +1147,7 @@ namespace AloeWeb_browser
                                 var terms = response.Split('|');
                                 foreach (var term in terms)
                                 {
-                                    var b = new BookmarkLink(term, "[From AI]");
+                                    var b = new BookmarkLink(term, "[From AI]".GetLocalized());
                                     suitableItems.Add(b);
                                     suitableItemsUrl.Add(b.Url);
                                 }
@@ -1365,11 +1493,20 @@ namespace AloeWeb_browser
         }
         private async void chat_Click(object sender, RoutedEventArgs e)
         {
-            var html = await WebBrowser.CoreWebView2.ExecuteScriptAsync("document.body.textContent");
-            var htmldecoded = JsonConvert.DeserializeObject(html).ToString();
-            HtmlToText htmlToText = new HtmlToText();
-            var plain = Uglify.HtmlToText(htmldecoded);
-            
+            //var html = await WebBrowser.CoreWebView2.ExecuteScriptAsync("document.body.textContent");
+            //var htmldecoded = JsonConvert.DeserializeObject(html).ToString();
+            //HtmlToText htmlToText = new HtmlToText();
+            //var plain = Uglify.HtmlToText(htmldecoded);
+            if (ChatGrid.Visibility == Visibility.Collapsed)
+            {
+                ChatGrid.Visibility = Visibility.Visible;
+                Tabs.SetValue(Grid.ColumnSpanProperty, 3);
+            }
+            else
+            {
+                ChatGrid.Visibility = Visibility.Collapsed;
+                Tabs.SetValue(Grid.ColumnSpanProperty, 4);
+            }
         }
 
         private async void CaptureMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1410,11 +1547,65 @@ namespace AloeWeb_browser
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             Common.conversation.AppendUserInput(userinput.Text);
+            SimpleMessage user = new SimpleMessage();
+            user.content = userinput.Text;
+            user.role = "User".GetLocalized();
+            user.iconsource = "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png";
+            userinput.Text = "";
+            ChatList.Items.Add(user);
             var aisay = await Common.conversation.GetResponseFromChatbot();
-            var aisaid = new ListViewItem();
-            aisaid.Content = aisay;
+            var aisaid = new SimpleMessage();
+            aisaid.content = aisay;
+            aisaid.role = "AI";
+            aisaid.iconsource = "https://cdn-icons-png.flaticon.com/512/4711/4711987.png";
             ChatList.Items.Add(aisaid);
         }
+
+        private void userinput_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                Button_Click(null, null);
+            }
+            
+        }
+
+        private void TranslateMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            string tg = (string)localSettings.Values["translator"];
+            if(tg is null || tg=="google")
+                WebBrowser.Source = new Uri("https://translate.google.com/translate?u=" + WebBrowser.Source + "& client=webapp");
+            else if(tg=="baidu")
+                WebBrowser.Source = new Uri("http://fanyi.baidu.com/transpage?query=" + WebBrowser.Source + " &source=url&ie=utf8");
+        }
+
+        private async void PrivacyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            await WebBrowser.EnsureCoreWebView2Async();
+            
+        }
+
+        private void MuteMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (MuteMenuItem.IsChecked)
+                {
+                    WebBrowser.CoreWebView2.IsMuted = true;
+                }
+                else
+                {
+                    WebBrowser.CoreWebView2.IsMuted = false;
+                }
+            }
+            catch (Exception ex) { }
+        }
+    }
+    public class SimpleMessage
+    {
+        public string content;
+        public string role;
+        public string iconsource;
     }
 }
 

@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
+    x:Uid="About"
     Title="About AloeWeb"
     PrimaryButtonText="Install WebView2"
     PrimaryButtonStyle="{ThemeResource AccentButtonStyle}"
@@ -18,16 +19,19 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto">
             </RowDefinition>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock TextWrapping="Wrap" Grid.Row="0">AloeWeb is a lightweight UWP browser based on the  <Hyperlink NavigateUri="https://github.com/muznyo/Yttrium">
+        <TextBlock x:Uid="AboutText1" x:Name="AboutText1" TextWrapping="Wrap" Grid.Row="0">AloeWeb is a lightweight UWP browser based on the  <Hyperlink NavigateUri="https://github.com/muznyo/Yttrium">
                Yttrium
             </Hyperlink> project and the <Hyperlink NavigateUri="https://github.com/chromium/chromium">
                Chromium
             </Hyperlink> project.
         </TextBlock>
-        <TextBlock TextWrapping="Wrap" Grid.Row="1">AloeWeb relies on Edge WebView2 Runtime, so if you have problems viewing it, you will need to install it first or fix it in the settings.
+        <TextBlock x:Uid="AboutText2" TextWrapping="Wrap" Grid.Row="1">AloeWeb relies on Edge WebView2 Runtime, so if you have problems viewing it, you will need to install it first or fix it in the settings.
         </TextBlock>
-            
+        <TextBlock x:Uid="AboutText3" TextWrapping="Wrap" Grid.Row="3">Copyright (c) 2023 Aloereed.
+        </TextBlock>
+
     </Grid>
 
 </ContentDialog>

@@ -25,6 +25,7 @@
                        Width="20"
                        Height="20" />
                 <TextBlock x:Name="AppTitle"
+                           x:Uid="AppTitle"
                            Text="AloeWeb browser | Settings"
                            VerticalAlignment="Center"
                            Margin="12, 0, 0, 0"
@@ -43,25 +44,25 @@
                               SelectionChanged="settingsNavView_SelectionChanged">
             <winui:NavigationView.MenuItems>
                 <winui:NavigationViewItem Content="General"
-                                          x:Name="GeneralItem">
+                                          x:Name="GeneralItem" x:Uid="GeneralItem">
                     <winui:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xEC25;" />
                     </winui:NavigationViewItem.Icon>
                 </winui:NavigationViewItem>
                 <winui:NavigationViewItem Content="Favorites"
-                                          x:Name="FavoritesItem">
+                                          x:Name="FavoritesItem" x:Uid="FavoritesItem">
                     <winui:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE734;" />
                     </winui:NavigationViewItem.Icon>
                 </winui:NavigationViewItem>
                 <winui:NavigationViewItem Content="History"
-                                          x:Name="HistoryItem">
+                                          x:Name="HistoryItem" x:Uid="HistoryItem">
                     <winui:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE81C;" />
                     </winui:NavigationViewItem.Icon>
                 </winui:NavigationViewItem>
                 <winui:NavigationViewItem Content="Search Engine"
-                                          x:Name="SearchEngineItem">
+                                          x:Name="SearchEngineItem" x:Uid="SearchEngineItem">
                     <winui:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE721;" />
                     </winui:NavigationViewItem.Icon>

@@ -1,5 +1,6 @@
 ﻿using AloeWeb;
 using BookmarksManager;
+using Microsoft.Toolkit.Uwp;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -84,8 +85,21 @@ namespace AloeWeb_browser
             await tmp.EnsureCoreWebView2Async();
             tmp.CoreWebView2.CookieManager.DeleteAllCookies();
             ContentDialog aboutdialog = new ContentDialog();
-            aboutdialog.Title = "Cookies Manager";
-            aboutdialog.Content = "Cookies have been all deleted.";
+            aboutdialog.Title = "cookman".GetLocalized();
+            aboutdialog.Content = "cookalld".GetLocalized();
+            aboutdialog.CloseButtonText = "OK";
+            var result = await aboutdialog.ShowAsync();
+            tmp.Close();
+        }
+
+        private async void RemoveAllOther_Click(object sender, RoutedEventArgs e)
+        {
+            WebView2 tmp = new WebView2();
+            await tmp.EnsureCoreWebView2Async();
+            await tmp.CoreWebView2.Profile.ClearBrowsingDataAsync();
+            ContentDialog aboutdialog = new ContentDialog();
+            aboutdialog.Title = "dataman".GetLocalized();
+            aboutdialog.Content = "datalld".GetLocalized();
             aboutdialog.CloseButtonText = "OK";
             var result = await aboutdialog.ShowAsync();
             tmp.Close();

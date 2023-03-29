@@ -117,7 +117,202 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About.CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="About.PrimaryButtonText" xml:space="preserve">
+    <value>Install WebView2</value>
+  </data>
+  <data name="About.Title" xml:space="preserve">
+    <value>About AloeWeb</value>
+  </data>
+  <data name="AboutMenuItem.Text" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="AboutText1.Text" xml:space="preserve">
+    <value>AloeWeb is a lightweight UWP browser based on the Yttrium project and the Chromium project.</value>
+  </data>
+  <data name="AboutText2.Text" xml:space="preserve">
+    <value>AloeWeb relies on Edge WebView2 Runtime, so if you have problems viewing it, you will need to install it first or fix it in the settings.</value>
+  </data>
+  <data name="AIHello" xml:space="preserve">
+    <value>Hi, I'm an intelligent assistant in AloeWeb, how can I help you?</value>
+  </data>
+  <data name="AppTitle.Text" xml:space="preserve">
+    <value>AloeWeb Browser | Settings</value>
+  </data>
+  <data name="CaptureMenuItem.Text" xml:space="preserve">
+    <value>Capture</value>
+  </data>
+  <data name="cookalld" xml:space="preserve">
+    <value>Cookies have been all deleted.</value>
+  </data>
+  <data name="cookman" xml:space="preserve">
+    <value>Cookies Manager</value>
+  </data>
+  <data name="CreateTabMenuItem.Text" xml:space="preserve">
+    <value>Create a New Tab</value>
+  </data>
+  <data name="CreateWindowMenuItem.Text" xml:space="preserve">
+    <value>Create a New Window</value>
+  </data>
+  <data name="CustomAPI.PlaceholderText" xml:space="preserve">
+    <value>OpenAI API key</value>
+  </data>
+  <data name="CustomDownloader.PlaceholderText" xml:space="preserve">
+    <value>Path of FDM.exe</value>
+  </data>
+  <data name="CustomHome.Content" xml:space="preserve">
+    <value>Custom Homepage</value>
+  </data>
+  <data name="Customprofile.PlaceholderText" xml:space="preserve">
+    <value>Path of your specified folder</value>
+  </data>
+  <data name="datalld" xml:space="preserve">
+    <value>Data have been all deleted.</value>
+  </data>
+  <data name="dataman" xml:space="preserve">
+    <value>Data Manager</value>
+  </data>
+  <data name="ddl.Text" xml:space="preserve">
+    <value>Downloader</value>
+  </data>
+  <data name="DevToolsMenuItem.Text" xml:space="preserve">
+    <value>Developer Tools</value>
+  </data>
+  <data name="Downdir.PlaceholderText" xml:space="preserve">
+    <value>Default Download Folder, if left empty, the user download folder is used.</value>
+  </data>
+  <data name="DownloadMenuItem.Text" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="ExpanderHis.Header" xml:space="preserve">
+    <value>All histories</value>
+  </data>
+  <data name="FavBarMenuItem.Text" xml:space="preserve">
+    <value>Favorite Bar</value>
+  </data>
+  <data name="favi.Text" xml:space="preserve">
+    <value>Favicon Getter</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="FavoritesItem.Content" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="GeneralItem.Content" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="HaveSSL" xml:space="preserve">
+    <value>This website has a SSL certificate.</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="HistoryItem.Content" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="HomeasTab.Content" xml:space="preserve">
+    <value>Same as New Tab page</value>
+  </data>
+  <data name="homepage.Text" xml:space="preserve">
+    <value>Home Page</value>
+  </data>
+  <data name="ManBrow.Text" xml:space="preserve">
+    <value>Manage Browsing Histories</value>
+  </data>
   <data name="ManFav.Text" xml:space="preserve">
     <value>Manage Favorites</value>
+  </data>
+  <data name="MuteMenuItem.Text" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="New Tab" xml:space="preserve">
+    <value>New Tab</value>
+  </data>
+  <data name="newpage.Text" xml:space="preserve">
+    <value>New Page</value>
+  </data>
+  <data name="NoSSL" xml:space="preserve">
+    <value>This website is unsafe and doesn't have a SSL certificate.</value>
+  </data>
+  <data name="openais.Text" xml:space="preserve">
+    <value>OpenAI Settings</value>
+  </data>
+  <data name="prosync.Text" xml:space="preserve">
+    <value>Profile Synchronization</value>
+  </data>
+  <data name="RemoveAllCookies.Content" xml:space="preserve">
+    <value>Remove all cookies</value>
+  </data>
+  <data name="RemoveAllHis.Content" xml:space="preserve">
+    <value>Remove all histories</value>
+  </data>
+  <data name="RemoveAllOther.Content" xml:space="preserve">
+    <value>Remove other saved data</value>
+  </data>
+  <data name="Search Engine" xml:space="preserve">
+    <value>Search Engine</value>
+  </data>
+  <data name="SearchBar.PlaceholderText" xml:space="preserve">
+    <value>Use question mark (?) ending to get auto-completion suggestions from the AI.</value>
+  </data>
+  <data name="SearchEngineItem.Content" xml:space="preserve">
+    <value>Homepage &amp; Search Engine</value>
+  </data>
+  <data name="seg.Text" xml:space="preserve">
+    <value>Search Engine</value>
+  </data>
+  <data name="SettingsMenuItem.Text" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_Language.Text" xml:space="preserve">
+    <value>Language Settings</value>
+  </data>
+  <data name="Settings_Language_restart.Text" xml:space="preserve">
+    <value>This takes effect after restarting AloeWeb.</value>
+  </data>
+  <data name="SSLError" xml:space="preserve">
+    <value>This website has a SSL certificate, however, some errors are detected.</value>
+  </data>
+  <data name="trans.Text" xml:space="preserve">
+    <value>Translator</value>
+  </data>
+  <data name="TranslateMenuItem.Text" xml:space="preserve">
+    <value>Translate</value>
+  </data>
+  <data name="useadblock.Content" xml:space="preserve">
+    <value>Block redirects to indecent ads or fraudulent URLs</value>
+  </data>
+  <data name="useEmbeddedDownloader.Content" xml:space="preserve">
+    <value>Use Embedded Downloader</value>
+  </data>
+  <data name="useFDM.Content" xml:space="preserve">
+    <value>Use Free Download Manager</value>
+  </data>
+  <data name="usegpt.Content" xml:space="preserve">
+    <value>Use AI to enhance my browsing experience.</value>
+  </data>
+  <data name="uselocal.Content" xml:space="preserve">
+    <value>Use AloeWeb's local folder</value>
+  </data>
+  <data name="usenogpt.Content" xml:space="preserve">
+    <value>Do not use AI to enhance my browsing experience.</value>
+  </data>
+  <data name="useother.Content" xml:space="preserve">
+    <value>Use your specified folder</value>
+  </data>
+  <data name="usepwd.Content" xml:space="preserve">
+    <value>Enable automatic password saving</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="[From AI]" xml:space="preserve">
+    <value>[From AI]</value>
   </data>
 </root>

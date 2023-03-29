@@ -15,27 +15,33 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="30,0,0,0">
-            <TextBlock FontSize="24">New Page</TextBlock>
+            <TextBlock FontSize="24"  x:Uid="newpage">New Page</TextBlock>
                 <RadioButton x:Name="BingNew" GroupName="Newtabs" Content="Bing (like Edge)" IsChecked="True" Click="RadioButton_Click"/>
             <RadioButton x:Name="GoogleNew" GroupName="Newtabs" Content="Google" Click="GoogleNew_Click"/>
             <RadioButton x:Name="BaiduNew" GroupName="Newtabs" Content="Baidu" Click="BaiduNew_Click"/>
             <RadioButton x:Name="YandexNew" GroupName="Newtabs" Content="Yandex" Click="YandexNew_Click"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="30,0,0,0">
-            <TextBlock FontSize="24">Home Page</TextBlock>
-            <RadioButton x:Name="HomeasTab" GroupName="hometabs" Content="Same as New Tab page" IsChecked="True" Click="HomeasTab_Click"/>
-            <RadioButton x:Name="CustomHome" GroupName="hometabs" Content="Custom Homepage" Click="CustomHome_Click"/>
+            <TextBlock FontSize="24" x:Uid="homepage">Home Page</TextBlock>
+            <RadioButton x:Uid="HomeasTab" x:Name="HomeasTab"  GroupName="hometabs" Content="Same as New Tab page" IsChecked="True" Click="HomeasTab_Click"/>
+            <RadioButton x:Uid="CustomHome" x:Name="CustomHome" GroupName="hometabs" Content="Custom Homepage" Click="CustomHome_Click"/>
             <TextBox x:Name="CustomHomePage" IsEnabled="False" TextChanged="CustomHomePage_TextChanged"></TextBox>
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="30,0,0,0">
-            <TextBlock FontSize="24">Search Engine</TextBlock>
+            <TextBlock FontSize="24" x:Uid="seg">Search Engine</TextBlock>
             <RadioButton x:Name="Bing" GroupName="earch" Content="Bing" IsChecked="True" Click="Bing_Click"/>
             <RadioButton x:Name="Google" GroupName="earch" Content="Google" Click="Google_Click"/>
             <RadioButton x:Name="Baidu" GroupName="earch" Content="Baidu" Click="Baidu_Click"/>
             <RadioButton x:Name="Yandex" GroupName="earch" Content="Yandex" Click="Yandex_Click"/>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Margin="30,0,0,0">
+            <TextBlock FontSize="24" x:Uid="favi">Favicon Getter</TextBlock>
+            <RadioButton x:Name="GoogleFav" GroupName="favearch" Content="Google" Click="FavGoogle_Click" IsChecked="True"/>
+            <RadioButton x:Name="FaviconKit" GroupName="favearch" Content="FaviconKit" Click="FaviconKit_Click"/>
         </StackPanel>
 
     </Grid>

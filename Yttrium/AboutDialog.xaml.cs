@@ -23,6 +23,7 @@ namespace AloeWeb
         public AboutDialog()
         {
             this.InitializeComponent();
+            var a = AboutText1.Text;
         }
 
         private async void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

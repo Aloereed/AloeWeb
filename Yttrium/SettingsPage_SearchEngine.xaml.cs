@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AloeWeb.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -93,12 +94,27 @@ namespace AloeWeb_browser
             {
                 localSettings.Values["homepage"] = "";
             }
+            try
+            {
+                localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                string nt = (string)localSettings.Values["favi"];
+                if (nt is null || nt == "google")
+                    GoogleFav.IsChecked = true;
+                else
+                {
+                    FaviconKit.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+               
+            }
         }
 
         private void RadioButton_Click(object sender, RoutedEventArgs e)
         {
             
-            localSettings.Values["newtab"] = "https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title="+"New Tab";
+            localSettings.Values["newtab"] = "https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title="+"New Tab".GetLocalized();
         }
 
         private void GoogleNew_Click(object sender, RoutedEventArgs e)
@@ -152,6 +168,16 @@ namespace AloeWeb_browser
         private void Yandex_Click(object sender, RoutedEventArgs e)
         {
             localSettings.Values["search"] = "https://yandex.com/search/?text=";
+        }
+
+        private void FavGoogle_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["favi"] = "google";
+        }
+
+        private void FaviconKit_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["favi"] = "favk";
         }
     }
 }

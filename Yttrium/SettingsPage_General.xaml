@@ -15,25 +15,52 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="30,0,0,0">
-            <TextBlock FontSize="24">Profile Synchronization</TextBlock>
-                <RadioButton x:Name="uselocal" GroupName="profile" Content="Use AloeWeb's local folder" IsChecked="True" Click="uselocal_Click"/>
-                <RadioButton x:Name="useother" GroupName="profile" Content="Use your specified folder" Click="useother_Click"/>
-            <TextBox x:Name="Customprofile" IsEnabled="False" TextChanged="Customprofile_TextChanged" PlaceholderText="Path of your specified folder"></TextBox>
+            <TextBlock FontSize="24" x:Uid="prosync">Profile Synchronization</TextBlock>
+            <RadioButton x:Name="uselocal" x:Uid="uselocal" GroupName="profile" Content="Use AloeWeb's local folder" IsChecked="True" Click="uselocal_Click"/>
+            <RadioButton x:Name="useother" x:Uid="useother" GroupName="profile" Content="Use your specified folder" Click="useother_Click"/>
+            <TextBox x:Name="Customprofile" x:Uid="Customprofile" IsEnabled="False" TextChanged="Customprofile_TextChanged" PlaceholderText="Path of your specified folder"></TextBox>
+            <CheckBox x:Uid="usepwd" x:Name="usepwd" IsChecked="False" Click="usepwd_Click">Enable automatic password saving</CheckBox>
+            <CheckBox x:Uid="useadblock" x:Name="useadblock" IsChecked="False" Click="useadblock_Click">Block redirects to advertising or fraudulent URLs</CheckBox>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="30,0,0,0">
-            <TextBlock FontSize="24">Downloader</TextBlock>
-            <RadioButton x:Name="useEmbeddedDownloader" GroupName="downloader" Content="Use Embbeded Downloader" IsChecked="True" Click="useEmbeddedDownloader_Click"/>
-            <RadioButton x:Name="useFDM" GroupName="downloader" Content="Use Free Download Manager" Click="useFDM_Click"/>
-            <TextBox x:Name="CustomDownloader" IsEnabled="False" TextChanged="CustomDownloader_TextChanged" PlaceholderText="Path of FDM.exe"></TextBox>
+            <TextBlock FontSize="24" x:Uid="ddl">Downloader</TextBlock>
+            <RadioButton x:Name="useEmbeddedDownloader" x:Uid="useEmbeddedDownloader" GroupName="downloader" Content="Use Embbeded Downloader" IsChecked="True" Click="useEmbeddedDownloader_Click"/>
+            <TextBox Visibility="Collapsed" x:Name="Downdir" x:Uid="Downdir" IsEnabled="True" TextChanged="Downdir_TextChanged" PlaceholderText="Default Download Folder, if left empty, the user download folder is used."></TextBox>
+            <RadioButton x:Name="useFDM" x:Uid="useFDM" GroupName="downloader" Content="Use Free Download Manager" Click="useFDM_Click"/>
+            <TextBox x:Name="CustomDownloader" x:Uid="CustomDownloader" IsEnabled="False" TextChanged="CustomDownloader_TextChanged" PlaceholderText="Path of FDM.exe"></TextBox>
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="30,0,0,0">
-            <TextBlock FontSize="24">OpenAI Settings</TextBlock>
-            <RadioButton x:Name="usenogpt" GroupName="openai" Content="Do not use AI to enhance my browsing experience." IsChecked="True" Click="usenogpt_Click"/>
-            <RadioButton x:Name="usegpt" GroupName="openai" Content="Use AI to enhance my browsing experience." Click="usegpt_Click"/>
-            <TextBox x:Name="CustomAPI" IsEnabled="False" PlaceholderText="OpenAI API key" TextChanged="CustomAPI_TextChanged"></TextBox>
+            <TextBlock FontSize="24" x:Uid="openais">OpenAI Settings</TextBlock>
+            <RadioButton x:Name="usenogpt" x:Uid="usenogpt" GroupName="openai" Content="Do not use AI to enhance my browsing experience." IsChecked="True" Click="usenogpt_Click"/>
+            <RadioButton x:Name="usegpt" x:Uid="usegpt" GroupName="openai" Content="Use AI to enhance my browsing experience." Click="usegpt_Click"/>
+            <TextBox x:Name="CustomAPI" x:Uid="CustomAPI" IsEnabled="False" PlaceholderText="OpenAI API key" TextChanged="CustomAPI_TextChanged"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Margin="30,0,0,0">
+            <TextBlock FontSize="24" x:Uid="trans">Translator</TextBlock>
+            <RadioButton x:Name="usegoogle" x:Uid="usegoogle" GroupName="translator" Content="Google" IsChecked="True" Click="usegoogle_Click"/>
+            <RadioButton x:Name="usebaidu" x:Uid="usebaidu" GroupName="translator" Content="Baidu" Click="usebaidu_Click"/>
+        
+        </StackPanel>
+        <StackPanel Grid.Row="4" Margin="30,0,0,0">
+            <TextBlock FontSize="24" x:Uid="Settings_Language" Text="Language Settings" />
+            <ComboBox Name="LanguageSet" SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBoxItem x:Uid="langset" Name="langset"  Content="Choose Language" IsSelected="True"></ComboBoxItem>
+                <ComboBoxItem x:Uid="autolang"   Content="Auto Select" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="zh"   Content="zh-CN 简体中文" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="en"   Content="en-US English" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="zhtw"   Content="zh-TW 繁體中文" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="de"  Content="de-DE Deutsch" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="fr"   Content="fr-FR Français" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="ru"   Content="ru-RU Русский язык" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="ja"   Content="ja-JP 日本語" ></ComboBoxItem>
+                <ComboBoxItem x:Uid="ko"   Content="ko-KR 한국어" ></ComboBoxItem>
+            </ComboBox>
+            <TextBlock FontSize="15" x:Uid="Settings_Language_restart" Text="This takes effect after restarting AloeWeb." />
         </StackPanel>
 
     </Grid>

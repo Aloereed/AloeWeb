@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AloeWeb.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace AloeWeb_browser
             FrameNavigationOptions navOptions = new FrameNavigationOptions();
             navOptions.IsNavigationStackEnabled = false;
             var pageType = typeof(SettingsPage_Favorites);
-            settingsNavView.Header = "Favotites";
+            settingsNavView.Header = "Favorites".GetLocalized();
             contentFrame.NavigateToType(pageType, null, navOptions);
         }
         public void NavToHis()
@@ -48,7 +49,7 @@ namespace AloeWeb_browser
             FrameNavigationOptions navOptions = new FrameNavigationOptions();
             navOptions.IsNavigationStackEnabled = false;
             var pageType = typeof(SettingsPage_History);
-            settingsNavView.Header = "History";
+            settingsNavView.Header = "History".GetLocalized();
             contentFrame.NavigateToType(pageType, null, navOptions);
         }
         private void settingsNavView_SelectionChanged(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewSelectionChangedEventArgs args)
@@ -61,22 +62,22 @@ namespace AloeWeb_browser
             if (args.SelectedItem == FavoritesItem)
             {
                 pageType = typeof(SettingsPage_Favorites);
-                settingsNavView.Header = "Favorites";
+                settingsNavView.Header = "Favorites".GetLocalized();
             }
             else if (args.SelectedItem == HistoryItem)
             {
                 pageType = typeof(SettingsPage_History);
-                settingsNavView.Header = "History";
+                settingsNavView.Header = "History".GetLocalized();
             }
             else if (args.SelectedItem == GeneralItem)
             {
                 pageType = typeof(SettingsPage_General) ;
-                settingsNavView.Header = "General";
+                settingsNavView.Header = "General".GetLocalized();
             }
             else if (args.SelectedItem == SearchEngineItem)
             {
                 pageType = typeof(SettingsPage_SearchEngine);
-                settingsNavView.Header = "Search Engine";
+                settingsNavView.Header = "Search Engine".GetLocalized();
             }
             contentFrame.NavigateToType(pageType, null, navOptions);
 

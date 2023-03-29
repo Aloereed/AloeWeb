@@ -121,7 +121,7 @@
                         <MenuFlyout x:Name="HisList">
                             <!-- his button -->
                             <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                            <MenuFlyoutItem x:Name="ManBrow" Click="ManBrow_Click">Manage Browsing Histories</MenuFlyoutItem>
+                            <MenuFlyoutItem x:Uid="ManBrow" x:Name="ManBrow" Click="ManBrow_Click">Manage Browsing Histories</MenuFlyoutItem>
                         </MenuFlyout>
                     </Button.Flyout>
 
@@ -196,7 +196,7 @@
                 <Button.Flyout>
                     <MenuFlyout>
                         <!-- settings button -->
-                        <MenuFlyoutItem x:Name="CreateWindowMenuItem"
+                        <MenuFlyoutItem x:Uid="CreateWindowMenuItem" x:Name="CreateWindowMenuItem"
                                         Text="Create a New Window"
                                         Click="CreateWindowMenuItem_Click"
                                         AccessKey="N">
@@ -209,7 +209,7 @@
                                 <FontIcon Glyph="&#xE78B;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem x:Name="CreateTabMenuItem"
+                        <MenuFlyoutItem x:Uid="CreateTabMenuItem" x:Name="CreateTabMenuItem"
                                         Text="Create a New Tab"
                                         Click="CreateTabMenuItem_Click"
                                         AccessKey="T">
@@ -222,21 +222,35 @@
                                 <FontIcon Glyph="&#xED0E;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem x:Name="DownloadMenuItem"
+                        <MenuFlyoutItem x:Uid="DownloadMenuItem" x:Name="DownloadMenuItem"
                                         Text="Downloads"
                                         Click="DownloadMenuItem_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE896;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <ToggleMenuFlyoutItem x:Name="FavBarMenuItem"
+                        <ToggleMenuFlyoutItem x:Name="FavBarMenuItem" x:Uid="FavBarMenuItem"
                                         Text="Favorite Bar" 
                                         Click="FavBarMenuItem_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE76F;" />
                             </MenuFlyoutItem.Icon>
                         </ToggleMenuFlyoutItem>
-                        <MenuFlyoutItem x:Name="CaptureMenuItem"
+                        <ToggleMenuFlyoutItem x:Name="PrivacyMenuItem" x:Uid="PrivacyBarMenuItem" Visibility="Collapsed"
+                                        Text="Privacy Mode" 
+                                        Click="PrivacyMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xF540;" />
+                            </MenuFlyoutItem.Icon>
+                        </ToggleMenuFlyoutItem>
+                        <ToggleMenuFlyoutItem x:Name="MuteMenuItem" x:Uid="MuteMenuItem"
+                                        Text="Mute" 
+                                        Click="MuteMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74F;" />
+                            </MenuFlyoutItem.Icon>
+                        </ToggleMenuFlyoutItem>
+                        <MenuFlyoutItem x:Name="CaptureMenuItem" x:Uid="CaptureMenuItem"
                                         Text="Capture"
                                         Click="CaptureMenuItem_Click"
                                         AccessKey="S">
@@ -249,22 +263,30 @@
                                 <FontIcon Glyph="&#xE722;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Name="TranslateMenuItem" x:Uid="TranslateMenuItem"
+                                        Text="Translate"
+                                        Click="TranslateMenuItem_Click"
+                                        >
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xF2B7;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                        <MenuFlyoutItem x:Name="DevToolsMenuItem"
+                        <MenuFlyoutItem x:Name="DevToolsMenuItem" x:Uid="DevToolsMenuItem"
                                         Text="Developer Tools"
                                         Click="DevToolsMenuItem_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xEC7A;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem x:Name="SettingsMenuItem"
+                        <MenuFlyoutItem x:Name="SettingsMenuItem" x:Uid="SettingsMenuItem"
                                         Text="Settings"
                                         Click="SettingsMenuItem_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE713;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem x:Name="AboutMenuItem"
+                        <MenuFlyoutItem x:Name="AboutMenuItem" x:Uid="AboutMenuItem"
                                         Text="About"
                                         Click="AboutMenuItem_Click">
                             <MenuFlyoutItem.Icon>
@@ -278,7 +300,7 @@
                           FontSize="15" />
 
             </Button>
-            <Button x:Name="chat" Visibility="Collapsed" Grid.Column="3" Margin="50,10,0,0" Click="chat_Click">
+            <Button x:Name="chat"  Grid.Column="3" Margin="50,10,0,0" Click="chat_Click">
                 <FontIcon Glyph="&#xE8F2;"
                           FontSize="15" />
             </Button>
@@ -313,7 +335,7 @@
             </StackPanel>
 
             <winui:TabView x:Name="Tabs"
-                           Grid.ColumnSpan="3"
+                           Grid.ColumnSpan="4"
                            Grid.Row="2"
                            Margin="0,-3,0,0"
                            HorizontalAlignment="Stretch"
@@ -333,7 +355,7 @@
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </winui:TabView.TabStripFooter>
-                <winui:TabViewItem x:Name="FirstTab" Header="Blank" winui:BackdropMaterial.ApplyToRootOrPageBackground="True">
+                <winui:TabViewItem x:Name="FirstTab"  Header="Blank" winui:BackdropMaterial.ApplyToRootOrPageBackground="True">
                     <Frame x:Name="FirstTabContent">
                         <!-- webview -->
                         <winui:WebView2 NavigationStarting="WebBrowser_NavigationStarting"
@@ -346,21 +368,38 @@
                     </Frame>
                 </winui:TabViewItem>
             </winui:TabView>
-            <Grid Grid.Row="2" Grid.Column="4">
+            <Grid Grid.Row="2" Grid.Column="4" x:Name="ChatGrid" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="8*"></RowDefinition>
                     <RowDefinition Height="2*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <ListView x:Name="ChatList" Grid.Row="0">
-                    <ListViewItem>AI: Hi, I'm your assistant in AloeWeb, how can I help you?</ListViewItem>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:Name="DoubleLineDataTemplate" x:DataType="local:SimpleMessage">
+                            <SwipeControl>
+                                <StackPanel Orientation="Horizontal" Height="Auto" AutomationProperties.Name="{x:Bind role}">
+                                    <Ellipse Height="48" Width="48" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="{x:Bind iconsource}"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <StackPanel x:Name="Sp" Orientation="Vertical" VerticalAlignment="Center" Margin="12,0,0,0">
+                                        <TextBlock Text="{x:Bind role}"  Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" />
+                                        <TextBlock TextWrapping="Wrap" MaxWidth="200" Text="{x:Bind content}" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </SwipeControl>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
                 </ListView>
                 <Grid x:Name="UserBox" Grid.Row="1" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="9*"></ColumnDefinition>
                         <ColumnDefinition Width="1*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="userinput" HorizontalAlignment="Stretch"></TextBox>
-                    <Button Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="{x:Bind UserBox.Width}" Click="Button_Click">Send</Button>
+                    <TextBox x:Name="userinput" HorizontalAlignment="Stretch" KeyDown="userinput_KeyDown"></TextBox>
+                    <Button Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="{x:Bind UserBox.Width}" Click="Button_Click">>></Button>
                 </Grid>
             </Grid>
         </Grid>

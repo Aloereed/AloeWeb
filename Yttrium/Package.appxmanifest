@@ -11,15 +11,15 @@
   IgnorableNamespaces="uap mp desktop4 iot2 rescap desktop">
 
   <Identity
-    Name="AloeWeb.Browser"
-    Publisher="CN=huzheng"
-    Version="1.0.0.0" />
+    Name="Aloereed.AloeWeb"
+    Publisher="CN=Aloereed"
+    Version="1.0.2.0" />
 
-  <mp:PhoneIdentity PhoneProductId="62b3ecf5-f123-4873-9bfb-b6d325b51f33" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="51f19a56-b1d1-4d6d-9003-d4dda3ba0528" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>AloeWeb</DisplayName>
-    <PublisherDisplayName>muznyo</PublisherDisplayName>
+    <PublisherDisplayName>Aloereed</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -41,7 +41,7 @@
         DisplayName="AloeWeb"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="AloeWeb browser"
+        Description="AloeWeb Browser"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png" ShortName="AloeWeb">
           <uap:ShowNameOnTiles>

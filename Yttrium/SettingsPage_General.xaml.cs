@@ -48,6 +48,23 @@ namespace AloeWeb_browser
             try
             {
                 localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                string nt = (string)localSettings.Values["downdir"];
+                if (nt is null || nt == "")
+                {
+                    
+                }
+                else
+                {
+                    Downdir.Text = nt;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            try
+            {
+                localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
                 string nt = (string)localSettings.Values["downloader"];
                 if (nt is null || nt == "") 
                     useEmbeddedDownloader.IsChecked = true;
@@ -78,28 +95,46 @@ namespace AloeWeb_browser
             catch (Exception ex)
             {
             }
+            try
+            {
+                localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                string nt = (string)localSettings.Values["translator"];
+                if (nt is null || nt == "google")
+                    usegoogle.IsChecked = true;
+                else
+                {
+                    usebaidu.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            try
+            {
+                localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                bool nt = (bool?)localSettings.Values["usepwd"]??false;
+                if (nt)
+                    usepwd.IsChecked = true;
+            }
+            catch (Exception ex)
+            {
+            }
+            try
+            {
+                localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                string nt = (string)localSettings.Values["blockads"];
+                if (nt is null || nt == "")
+                    useadblock.IsChecked = false;
+                else
+                {
+                    useadblock.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
-        private void RadioButton_Click(object sender, RoutedEventArgs e)
-        {
-            
-            localSettings.Values["newtab"] = "https://ntp.msn.com/edge/ntp?&dsp=0&prerender=1&title="+"New Tab";
-        }
-
-        private void GoogleNew_Click(object sender, RoutedEventArgs e)
-        {
-            localSettings.Values["newtab"] = "https://www.google.com";
-        }
-
-        private void BaiduNew_Click(object sender, RoutedEventArgs e)
-        {
-            localSettings.Values["newtab"] = "https://www.baidu.com";
-        }
-
-        private void YandexNew_Click(object sender, RoutedEventArgs e)
-        {
-            localSettings.Values["newtab"] = "https://www.yandex.com";
-        }
 
 
         private void uselocal_Click(object sender, RoutedEventArgs e)
@@ -128,6 +163,18 @@ namespace AloeWeb_browser
         {
             CustomDownloader.IsEnabled = false;
             localSettings.Values["downloader"] = "";
+            if (useEmbeddedDownloader.IsChecked ?? false)
+            {
+                try
+                {
+                    if (Directory.Exists(Downdir.Text))
+                    {
+                        localSettings.Values["downdir"] = Downdir.Text;
+                    }
+                }
+                catch (Exception)
+                { }
+            }
         }
 
         private void useFDM_Click(object sender, RoutedEventArgs e)
@@ -192,6 +239,65 @@ namespace AloeWeb_browser
         private void CustomAPI_TextChanged(object sender, TextChangedEventArgs e)
         {
             localSettings.Values["openaikey"] = CustomAPI.Text;
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string temp = ((ComboBoxItem)(LanguageSet.SelectedItem)).Content.ToString();
+            if (temp != "Choose Language")
+            {
+                string[] tempArr = temp.Split(' ');
+                ApplicationData.Current.LocalSettings.Values["CurrentLanguage"] = tempArr[0];
+            }
+        }
+
+        private void usegoogle_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["translator"] = "google";
+        }
+        private void usebaidu_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["translator"] = "baidu";
+        }
+
+        private void usepwd_Click(object sender, RoutedEventArgs e)
+        {
+            if(usepwd.IsChecked == true)
+            {
+                localSettings.Values["usepwd"] = true;
+            }
+            else
+            {
+                localSettings.Values["usepwd"] = false;
+            }
+        }
+
+        private void useadblock_Click(object sender, RoutedEventArgs e)
+        {
+            if (usepwd.IsChecked == true)
+            {
+                localSettings.Values["blockads"] = "yes";
+            }
+            else
+            {
+                localSettings.Values["blockads"] = "";
+            }
+        }
+
+        private void Downdir_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (useEmbeddedDownloader.IsChecked ?? false)
+            {
+                try
+                {
+                    if (Directory.Exists(Downdir.Text))
+                    {
+                        localSettings.Values["downdir"] = Downdir.Text;
+                    }
+                }
+                catch (Exception)
+                { }
+            }
         }
     }
 }

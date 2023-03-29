@@ -1,0 +1,318 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About.CloseButtonText" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="About.PrimaryButtonText" xml:space="preserve">
+    <value>安裝 WebView2</value>
+  </data>
+  <data name="About.Title" xml:space="preserve">
+    <value>關於 AloeWeb</value>
+  </data>
+  <data name="AboutMenuItem.Text" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="AboutText1.Text" xml:space="preserve">
+    <value>AloeWeb 是一款基於 Yttrium 項目和 Chromium 項目的輕量級 UWP 瀏覽器.</value>
+  </data>
+  <data name="AboutText2.Text" xml:space="preserve">
+    <value>AloeWeb 依賴於 Edge WebView2Runtime ，因此如果您在檢視它時遇到問題，則需要先安裝它或在系統設定中進行修復。</value>
+  </data>
+  <data name="AIHello" xml:space="preserve">
+    <value>嗨，我是 AloeWeb 的一名智慧型助理，有什麼可以幫你的嗎?</value>
+  </data>
+  <data name="AppTitle.Text" xml:space="preserve">
+    <value>AloeWeb 瀏覽器|設定</value>
+  </data>
+  <data name="CaptureMenuItem.Text" xml:space="preserve">
+    <value>捕獲</value>
+  </data>
+  <data name="cookalld" xml:space="preserve">
+    <value>Cookie 已全部刪除。</value>
+  </data>
+  <data name="cookman" xml:space="preserve">
+    <value>Cookie 管理器</value>
+  </data>
+  <data name="CreateTabMenuItem.Text" xml:space="preserve">
+    <value>建立新選項卡</value>
+  </data>
+  <data name="CreateWindowMenuItem.Text" xml:space="preserve">
+    <value>建立新視窗</value>
+  </data>
+  <data name="CustomAPI.PlaceholderText" xml:space="preserve">
+    <value>OpenAI API 密鑰</value>
+  </data>
+  <data name="CustomDownloader.PlaceholderText" xml:space="preserve">
+    <value>FDM.exe 的路徑</value>
+  </data>
+  <data name="CustomHome.Content" xml:space="preserve">
+    <value>自訂首頁</value>
+  </data>
+  <data name="Customprofile.PlaceholderText" xml:space="preserve">
+    <value>指定資料夾的路徑</value>
+  </data>
+  <data name="datalld" xml:space="preserve">
+    <value>資料已全部刪除。</value>
+  </data>
+  <data name="dataman" xml:space="preserve">
+    <value>資料管理器</value>
+  </data>
+  <data name="ddl.Text" xml:space="preserve">
+    <value>下載程式</value>
+  </data>
+  <data name="DevToolsMenuItem.Text" xml:space="preserve">
+    <value>開發人員工具</value>
+  </data>
+  <data name="Downdir.PlaceholderText" xml:space="preserve">
+    <value>預設下載資料夾，如果保留為空，則使用使用者下載資料夾.</value>
+  </data>
+  <data name="DownloadMenuItem.Text" xml:space="preserve">
+    <value>下載</value>
+  </data>
+  <data name="ExpanderHis.Header" xml:space="preserve">
+    <value>所有歷史記錄</value>
+  </data>
+  <data name="FavBarMenuItem.Text" xml:space="preserve">
+    <value>收藏夾列</value>
+  </data>
+  <data name="favi.Text" xml:space="preserve">
+    <value>Favicon 獲取器</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>收藏夾</value>
+  </data>
+  <data name="FavoritesItem.Content" xml:space="preserve">
+    <value>收藏夾</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>常規</value>
+  </data>
+  <data name="GeneralItem.Content" xml:space="preserve">
+    <value>常規</value>
+  </data>
+  <data name="HaveSSL" xml:space="preserve">
+    <value>此網站具有 SSL 證書.</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>歷史</value>
+  </data>
+  <data name="HistoryItem.Content" xml:space="preserve">
+    <value>歷史</value>
+  </data>
+  <data name="HomeasTab.Content" xml:space="preserve">
+    <value>與新選項卡頁面相同</value>
+  </data>
+  <data name="homepage.Text" xml:space="preserve">
+    <value>首頁</value>
+  </data>
+  <data name="ManBrow.Text" xml:space="preserve">
+    <value>管理瀏覽歷史記錄</value>
+  </data>
+  <data name="ManFav.Text" xml:space="preserve">
+    <value>管理收藏夾</value>
+  </data>
+  <data name="MuteMenuItem.Text" xml:space="preserve">
+    <value>靜音</value>
+  </data>
+  <data name="New Tab" xml:space="preserve">
+    <value>新標籤頁</value>
+  </data>
+  <data name="newpage.Text" xml:space="preserve">
+    <value>新增頁面</value>
+  </data>
+  <data name="NoSSL" xml:space="preserve">
+    <value>此網站不安全，並且沒有 SSL 證書.</value>
+  </data>
+  <data name="openais.Text" xml:space="preserve">
+    <value>OpenAI 設定</value>
+  </data>
+  <data name="prosync.Text" xml:space="preserve">
+    <value>設定檔案同步</value>
+  </data>
+  <data name="RemoveAllCookies.Content" xml:space="preserve">
+    <value>刪除所有 cookie</value>
+  </data>
+  <data name="RemoveAllHis.Content" xml:space="preserve">
+    <value>刪除所有歷史記錄</value>
+  </data>
+  <data name="RemoveAllOther.Content" xml:space="preserve">
+    <value>刪除其他儲存的資料</value>
+  </data>
+  <data name="Search Engine" xml:space="preserve">
+    <value>搜尋引擎</value>
+  </data>
+  <data name="SearchBar.PlaceholderText" xml:space="preserve">
+    <value>使用問號（？）結尾從人工智慧型中獲取自動完成建議.</value>
+  </data>
+  <data name="SearchEngineItem.Content" xml:space="preserve">
+    <value>首頁搜尋引擎</value>
+  </data>
+  <data name="seg.Text" xml:space="preserve">
+    <value>搜尋引擎</value>
+  </data>
+  <data name="SettingsMenuItem.Text" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Settings_Language.Text" xml:space="preserve">
+    <value>語言設定</value>
+  </data>
+  <data name="Settings_Language_restart.Text" xml:space="preserve">
+    <value>這將在重新啟動 AloeWeb 後生效。</value>
+  </data>
+  <data name="SSLError" xml:space="preserve">
+    <value>此網站有 SSL 證書，但偵測到一些錯誤.</value>
+  </data>
+  <data name="trans.Text" xml:space="preserve">
+    <value>翻譯</value>
+  </data>
+  <data name="TranslateMenuItem.Text" xml:space="preserve">
+    <value>翻譯</value>
+  </data>
+  <data name="useadblock.Content" xml:space="preserve">
+    <value>阻止重定向到不雅廣告或欺騙性 URL</value>
+  </data>
+  <data name="useEmbeddedDownloader.Content" xml:space="preserve">
+    <value>使用嵌入式下載程式</value>
+  </data>
+  <data name="useFDM.Content" xml:space="preserve">
+    <value>使用FDM</value>
+  </data>
+  <data name="usegpt.Content" xml:space="preserve">
+    <value>使用人工智慧型增強我的瀏覽體驗。</value>
+  </data>
+  <data name="uselocal.Content" xml:space="preserve">
+    <value>使用 AloeWeb 的本機資料夾</value>
+  </data>
+  <data name="usenogpt.Content" xml:space="preserve">
+    <value>不要使用人工智慧型來增強我的瀏覽體驗。</value>
+  </data>
+  <data name="useother.Content" xml:space="preserve">
+    <value>使用指定的資料夾</value>
+  </data>
+  <data name="usepwd.Content" xml:space="preserve">
+    <value>啟用自動密碼儲存</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>使用者</value>
+  </data>
+  <data name="[From AI]" xml:space="preserve">
+    <value>[來自人工智慧型]</value>
+  </data>
+</root>
