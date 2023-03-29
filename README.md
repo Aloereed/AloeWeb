@@ -1,16 +1,25 @@
 <!--
  * @Author: 
  * @Date: 2023-03-22 23:35:57
- * @LastEditors: 
- * @LastEditTime: 2023-03-29 18:58:18
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-03-29 19:54:13
  * @Description: file content
 -->
 # AloeWeb
-### AloeWeb is a **Yttrium** project, which is a modern UWP browser with WinUI based on Edge WebView2 technology.
+### AloeWeb is a AI-integrated UWP Web Browser (a **Yttrium** project), which is  with WinUI based on Edge WebView2 technology.
+
+I need your help! When I submit to Microsoft Store, their testers consistently crash when the program starts. And I can't reproduce such problem in local development, debugging and deployment. Can an eager GitHuber take a look at what the problem is?
+
+## Pictures
+
+![Homepage](pics/home.png)
+![AI](pics/ai.png)
+![Password Autofill](pics/pass.png)
+![Common featurs](pics/set.png)
+![Settings](pics/setting.png)
 
 
-
-##  How to install?
+##  Old: How to install?
 1. Install [Edge WebView2 Core ](https://developer.microsoft.com/en-us/microsoft-edge/webview2/consumer/)if you don't have it installed yet
 2. Log in to GitHub
 3. Go to Actions tab of the Yttrium repository
