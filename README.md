@@ -1,9 +1,13 @@
-# Yttrium
-### Yttrium is a modern UWP browser with WinUI based on Edge WebView2 technology.
+<!--
+ * @Author: 
+ * @Date: 2023-03-22 23:35:57
+ * @LastEditors: 
+ * @LastEditTime: 2023-03-29 18:58:18
+ * @Description: file content
+-->
+# AloeWeb
+### AloeWeb is a **Yttrium** project, which is a modern UWP browser with WinUI based on Edge WebView2 technology.
 
-[Telegram group](https://t.me/yttriumgroup)
-
-[Developer Sanctuary Discord Server](https://discord.gg/ddKEn2GJq5)
 
 
 ##  How to install?
@@ -17,5 +21,4 @@
 8. Run Install.ps1 script (or you can install package and certificate manually)
 9. Installed!
 
-#### Be aware that Yttrium is in its alpha stage and it's not finished yet!
 #### I am grateful for any contributions!
